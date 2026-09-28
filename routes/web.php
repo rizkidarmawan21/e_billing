@@ -9,7 +9,6 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\OwnerAdminController;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,40 +21,25 @@ use Illuminate\Support\Facades\Schema;
 |
 */
 
-// Health check: /up -> 200 kalau app + database sehat, 503 kalau tidak.
+// Health check ringan: hanya status service + komponen yang mati.
+// Tidak membocorkan versi, jumlah tabel, atau jumlah user.
 Route::get('/up', function () {
-    $checks = [
-        'app' => true,
-        'php' => PHP_VERSION,
-        'laravel' => app()->version(),
-    ];
+    $down = [];
 
     try {
         DB::connection()->getPdo();
-        $checks['database'] = true;
-
-        $tables = DB::select('SHOW TABLES');
-        $checks['tables'] = count($tables);
-
-        $checks['migrations_run'] = Schema::hasTable('migrations')
-            ? DB::table('migrations')->count()
-            : 0;
-
-        if (Schema::hasTable('users')) {
-            $checks['users'] = DB::table('users')->count();
-        }
     } catch (\Throwable $e) {
-        $checks['database'] = false;
-        $checks['error'] = $e->getMessage();
+        $down[] = 'database';
     }
 
-    $healthy = ($checks['database'] ?? false) === true;
+    if ($down === []) {
+        return response()->json(['status' => 'ok'], 200);
+    }
 
     return response()->json([
-        'status' => $healthy ? 'ok' : 'degraded',
-        'checks' => $checks,
-        'time' => now()->toIso8601String(),
-    ], $healthy ? 200 : 503);
+        'status' => 'down',
+        'down' => $down,
+    ], 503);
 })->name('health');
 
 Route::get('/', function () {
