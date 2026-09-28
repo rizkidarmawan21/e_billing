@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('nama');
             $table->string('no_hp');
             $table->text('alamat');
-            $table->unsignedBigInteger('package_id')->nullable()->after('alamat');
+            $table->unsignedBigInteger('package_id')->nullable();
             $table->timestamps();
 
             $table->foreign('package_id')
