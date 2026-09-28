@@ -6,7 +6,7 @@ RUN a2enmod rewrite headers
 # System deps + PHP extension deps
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        git curl zip unzip nodejs npm libonig-dev libpng-dev libjpeg-dev libfreetype6-dev && \
+        git curl zip unzip nodejs npm libonig-dev libpng-dev libjpeg-dev libfreetype6-dev libxml2-dev && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html
