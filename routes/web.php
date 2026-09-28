@@ -8,6 +8,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\OwnerAdminController;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +21,42 @@ use App\Http\Controllers\OwnerAdminController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+// Health check: /up -> 200 kalau app + database sehat, 503 kalau tidak.
+Route::get('/up', function () {
+    $checks = [
+        'app' => true,
+        'php' => PHP_VERSION,
+        'laravel' => app()->version(),
+    ];
+
+    try {
+        DB::connection()->getPdo();
+        $checks['database'] = true;
+
+        $tables = DB::select('SHOW TABLES');
+        $checks['tables'] = count($tables);
+
+        $checks['migrations_run'] = Schema::hasTable('migrations')
+            ? DB::table('migrations')->count()
+            : 0;
+
+        if (Schema::hasTable('users')) {
+            $checks['users'] = DB::table('users')->count();
+        }
+    } catch (\Throwable $e) {
+        $checks['database'] = false;
+        $checks['error'] = $e->getMessage();
+    }
+
+    $healthy = ($checks['database'] ?? false) === true;
+
+    return response()->json([
+        'status' => $healthy ? 'ok' : 'degraded',
+        'checks' => $checks,
+        'time' => now()->toIso8601String(),
+    ], $healthy ? 200 : 503);
+})->name('health');
 
 Route::get('/', function () {
     return view('welcome');
