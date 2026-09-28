@@ -10,9 +10,12 @@ class TrustProxies extends Middleware
     /**
      * The trusted proxies for this application.
      *
+     * Behind Traefik/Dokploy the app is reverse-proxied, so trust all proxies
+     * to correctly detect HTTPS via the X-Forwarded-* headers.
+     *
      * @var array<int, string>|string|null
      */
-    protected $proxies;
+    protected $proxies = '*';
 
     /**
      * The headers that should be used to detect proxies.
