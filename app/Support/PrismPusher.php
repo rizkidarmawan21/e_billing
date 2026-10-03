@@ -48,7 +48,11 @@ class PrismPusher
      */
     public function push(array $events): array
     {
-        $body = json_encode(['events' => $events], JSON_UNESCAPED_UNICODE);
+        // array_values: caller boleh kirim array dengan
+        // key non-sequential (misal hasil chunk()) —
+        // json_encode mengubahnya jadi JSON object,
+        // yang ditolak Prism ([]sync.Event).
+        $body = json_encode(['events' => array_values($events)], JSON_UNESCAPED_UNICODE);
         if ($body === false) {
             throw new \RuntimeException('json encode gagal: '.json_last_error_msg());
         }
