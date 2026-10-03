@@ -44,7 +44,7 @@ class CustomerObserver
                 'old_id' => $customer->id,
                 'event_id' => (string) \Illuminate\Support\Str::uuid(),
                 'payload' => [
-                    'id' => $customer->id,
+                    'id' => (string) $customer->id,
                     'kode_pelanggan' => $customer->kode_pelanggan,
                     'nama' => $customer->nama,
                     'no_hp' => $customer->no_hp,

@@ -33,7 +33,7 @@ class PackageObserver
                 'old_id' => $package->id,
                 'event_id' => (string) \Illuminate\Support\Str::uuid(),
                 'payload' => [
-                    'id' => $package->id,
+                    'id' => (string) $package->id,
                     'nama_paket' => $package->nama_paket,
                     'kecepatan' => $package->kecepatan,
                     // decimal:2 cast → string "150000.00", sesuai

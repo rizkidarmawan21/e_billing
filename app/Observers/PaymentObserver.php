@@ -56,7 +56,7 @@ class PaymentObserver
                 'old_id' => $payment->id,
                 'event_id' => (string) \Illuminate\Support\Str::uuid(),
                 'payload' => [
-                    'id' => $payment->id,
+                    'id' => (string) $payment->id,
                     'customer_code' => $customerCode,
                     'package_code' => $packageCode,
                     'periode' => $payment->periode,
