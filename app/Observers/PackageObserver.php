@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Jobs\SyncToPrismJob;
 use App\Models\Package;
 use App\Models\SyncOutbox;
 use App\Support\SyncCodec;
