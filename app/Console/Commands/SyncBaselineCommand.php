@@ -147,6 +147,12 @@ class SyncBaselineCommand extends Command
      */
     private function pushChunk(PrismPusher $pusher, $chunk): int
     {
+        // chunk() preserve keys (array_chunk
+        // dengan preserve_keys=true) — chunk ke-2+
+        // dimulai dari key 100, dst. Reindex supaya
+        // $chunk[0] dan $chunk[$i] valid di semua chunk.
+        $chunk = $chunk->values();
+
         if ($chunk->isEmpty()) {
             return 0;
         }
