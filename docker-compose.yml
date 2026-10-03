@@ -15,6 +15,21 @@ services:
       - app_storage:/var/www/html/storage
       - app_bootstrap:/var/www/html/bootstrap/cache
 
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: e_billing_worker
+    restart: unless-stopped
+    command: php artisan queue:work database --sleep=3 --tries=3
+    env_file:
+      - .env
+    depends_on:
+      - db
+    volumes:
+      - app_storage:/var/www/html/storage
+      - app_bootstrap:/var/www/html/bootstrap/cache
+
   db:
     image: mysql:8.0
     container_name: e_billing_db
