@@ -17,3 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// Stats untuk reconcile backstop sync Prism
+Route::middleware('auth:sanctum')
+    ->get('/migration/stats', [App\Http\Controllers\MigrationStatsController::class, '__invoke']);
