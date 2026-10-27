@@ -1,4 +1,6 @@
-@extends('layouts.admin')
+@extends(Auth::user()->role === 'owner' ? 'owner.layout' : 'layouts.admin')
+
+@section('header', Auth::user()->role === 'owner' ? 'Profile Owner' : 'Profile Admin')
 
 @section('content')
 
@@ -7,11 +9,13 @@
     {{-- HEADER HALAMAN --}}
     <div class="mb-4">
         <h4 class="fw-bold mb-1">
-            Profile Admin
+            {{ Auth::user()->role === 'owner' ? 'Profile Owner' : 'Profile Admin' }}
         </h4>
 
         <p class="text-muted mb-0">
-            Kelola informasi akun administrator.
+            {{ Auth::user()->role === 'owner'
+                ? 'Kelola informasi akun owner.'
+                : 'Kelola informasi akun administrator.' }}
         </p>
     </div>
 

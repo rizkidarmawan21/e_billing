@@ -341,13 +341,34 @@
 
 </div>
 
+{{-- TOMBOL ALL --}}
+<div class="d-flex justify-content-center mb-4">
+
+    @if($showAll)
+
+        <a href="{{ route('owner.dashboard') }}"
+           class="btn btn-outline-primary px-4">
+            ← Bulan Ini
+        </a>
+
+    @else
+
+        <a href="{{ route('owner.dashboard', ['all' => 1]) }}"
+           class="btn btn-outline-primary px-4">
+            ALL
+        </a>
+
+    @endif
+
+</div>
+
+
 {{-- GRAFIK PENDAPATAN & TAGIHAN --}}
 <div class="row g-4 mb-4">
 
     {{-- PENDAPATAN PER BULAN --}}
     <div class="col-lg-6">
         <div class="card border-0 shadow-sm h-100">
-
             <div class="card-body p-4">
 
                 <h5 class="fw-bold mb-1">
@@ -366,38 +387,36 @@
                 </div>
 
             </div>
-
         </div>
     </div>
 
-
-    {{-- TAGIHAN VS PENDAPATAN --}}
+    {{-- TUNGGAKAN CUSTOMER --}}
     <div class="col-lg-6">
         <div class="card border-0 shadow-sm h-100">
-
             <div class="card-body p-4">
 
                 <h5 class="fw-bold mb-1">
-                    Tagihan vs Pendapatan
+                    Tunggakan Customer per Bulan
                 </h5>
 
                 <p class="text-muted small mb-4">
-                    Perbandingan total tagihan dengan pendapatan
+                    Jumlah customer yang belum membayar pada setiap bulan
+                    tahun {{ $tahun }}
                 </p>
 
                 <div style="height: 300px;">
-                    <canvas
-                        id="tagihanPendapatanChart"
-                        data-values='@json($tagihanVsPendapatan)'>
-                    </canvas>
+                    <canvas 
+                    id="tunggakanCustomerChart"
+                    data-values='@json($tunggakanPerBulan)'>
+                </canvas>
                 </div>
 
             </div>
-
         </div>
     </div>
 
 </div>
+
 
     {{-- STATUS PEMBAYARAN & DISTRIBUSI PAKET --}}
 <div class="row g-4 mb-4">
@@ -490,5 +509,52 @@ function toggleBulan() {
 }
 
 </script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const canvas = document.getElementById('tunggakanCustomerChart');
+
+    if (!canvas) {
+        console.error('Canvas tunggakan tidak ditemukan');
+        return;
+    }
+
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js belum dimuat');
+        return;
+    }
+
+    new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: @json(array_values($namaBulan)),
+            datasets: [{
+                label: 'Tunggakan Customer',
+                data: @json($tunggakanPerBulan),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+});
+</script>
+
 
 @endsection

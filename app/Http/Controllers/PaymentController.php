@@ -145,6 +145,17 @@ public function index(Request $request)
      */
     public function store(Request $request)
     {
+
+if ($request->status === 'lunas') {
+    $request->merge([
+        'tanggal_bayar' => $request->tanggal_bayar ?? now()->toDateString(),
+    ]);
+} else {
+    $request->merge([
+        'tanggal_bayar' => null,
+    ]);
+}
+
       $validated = $request->validate([
     'customer_id' => [
         'required',
@@ -275,6 +286,17 @@ public function index(Request $request)
      */
     public function update(Request $request, Payment $payment)
     {
+
+if ($request->status === 'lunas') {
+    $request->merge([
+        'tanggal_bayar' => $request->tanggal_bayar ?? now()->toDateString(),
+    ]);
+} else {
+    $request->merge([
+        'tanggal_bayar' => null,
+    ]);
+}
+
       $validated = $request->validate([
     'customer_id' => [
         'required',

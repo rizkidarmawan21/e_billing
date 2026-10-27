@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Payment;
 use App\Models\Package;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -31,56 +33,57 @@ class CustomerController extends Controller
     /**
      * Menampilkan form tambah customer
      */
-    public function create()
-    {
-        $packages = Package::orderBy('harga')->get();
+   public function create()
+{
+    $packages = Package::orderBy('harga')->get();
 
-        return view('customers.create', compact('packages'));
-    }
+    return view('customers.create', compact('packages'));
+}
 
 
     /**
      * Menyimpan customer baru
      */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'kode_pelanggan' => [
-                'required',
-                'string',
-                'max:255',
-                'unique:customers,kode_pelanggan',
-            ],
+  public function store(Request $request)
+{
+    $validated = $request->validate([
+        'kode_pelanggan' => [
+            'required',
+            'string',
+            'max:255',
+            'unique:customers,kode_pelanggan',
+        ],
+        'nama' => ['required', 'string', 'max:255'],
+        'no_hp' => ['nullable', 'string', 'max:20'],
+        'alamat' => ['nullable', 'string'],
+        'package_id' => ['nullable', 'exists:packages,id'],
+    ]);
 
-            'nama' => [
-                'required',
-                'string',
-                'max:255',
-            ],
+    // Simpan customer
+    $customer = Customer::create($validated);
 
-            'no_hp' => [
-                'nullable',
-                'string',
-                'max:20',
-            ],
+    // Jika customer memiliki paket,
+    // otomatis buat tagihan bulan berjalan
+    if ($customer->package_id) {
 
-            'alamat' => [
-                'nullable',
-                'string',
-            ],
+        $customer->load('package');
 
-            'package_id' => [
-                'nullable',
-                'exists:packages,id',
-            ],
+        $now = Carbon::now();
+
+        Payment::create([
+            'customer_id' => $customer->id,
+            'package_id' => $customer->package_id,
+            'periode' => $now->locale('id')->translatedFormat('F'),
+            'tahun' => $now->year,
+            'jumlah_tagihan' => $customer->package->harga,
+            'status' => 'belum_bayar',
+            'tanggal_bayar' => null,
         ]);
-
-        Customer::create($validated);
-
-        return redirect()
-            ->route('customers.index')
-            ->with('success', 'Data customer berhasil ditambahkan.');
     }
+
+    return redirect()->route('customers.index')
+        ->with('success', 'Customer berhasil ditambahkan dan tagihan otomatis dibuat.');
+}
 
 
     /**

@@ -68,6 +68,26 @@ Route::get('/owner/laporan', [OwnerController::class, 'laporan'])
     ->middleware(['auth', 'verified', 'role:owner'])
     ->name('owner.admin.index');
 
+    Route::get('/owner/admin/create', [OwnerAdminController::class, 'create'])
+    ->middleware(['auth', 'verified', 'role:owner'])
+    ->name('owner.admin.create');
+    
+    Route::post('/owner/admin', [OwnerAdminController::class, 'store'])
+    ->middleware(['auth', 'verified', 'role:owner'])
+    ->name('owner.admin.store');
+
+    Route::get('/owner/admin/{user}/edit', [OwnerAdminController::class, 'edit'])
+    ->middleware(['auth', 'verified', 'role:owner'])
+    ->name('owner.admin.edit');
+
+Route::put('/owner/admin/{user}', [OwnerAdminController::class, 'update'])
+    ->middleware(['auth', 'verified', 'role:owner'])
+    ->name('owner.admin.update');
+
+Route::delete('/owner/admin/{user}', [OwnerAdminController::class, 'destroy'])
+    ->middleware(['auth', 'verified', 'role:owner'])
+    ->name('owner.admin.destroy');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

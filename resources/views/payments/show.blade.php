@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends(Auth::user()->role === 'owner' ? 'owner.layout' : 'layouts.admin')
 
 @section('header', 'Detail Payment')
 

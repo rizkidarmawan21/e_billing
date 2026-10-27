@@ -224,7 +224,25 @@
 
     </div>
 
+{{-- ========================= --}}
+{{-- TOMBOL ALL --}}
+{{-- ========================= --}}
 
+<div class="d-flex justify-content-center gap-2 mb-4">
+
+    {{-- TOMBOL ALL --}}
+    <a href="{{ route('dashboard', ['tahun' => $tahun, 'all' => 1]) }}"
+       class="btn btn-primary px-4">
+        ALL
+    </a>
+
+    {{-- KEMBALI KE BULAN SEKARANG --}}
+    <a href="{{ route('dashboard', ['tahun' => now()->year]) }}"
+       class="btn btn-secondary px-4">
+        Bulan Sekarang
+    </a>
+
+</div>
 
     {{-- ========================= --}}
     {{-- DIAGRAM --}}
@@ -247,10 +265,10 @@
 
                         <small class="text-muted">
 
-                            @if($bulan)
-                                Status pembayaran {{ $bulan }} {{ $tahun }}
+                            @if($showAll)
+                                Status pembayaran seluruh tahun {{ $tahun }}
                             @else
-                                Status pembayaran tahun {{ $tahun }}
+                                Status pembayaran {{ $periodeDashboard }} {{ $tahun }}
                             @endif
 
                         </small>
@@ -308,181 +326,101 @@
 </div>
 
 
-
 {{-- ========================= --}}
 {{-- CHART.JS --}}
 {{-- ========================= --}}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-
 <script>
-
     /*
     |--------------------------------------------------------------------------
     | FILTER BULAN
     |--------------------------------------------------------------------------
     */
-
     function toggleBulan() {
-
         const checkbox = document.getElementById('filterBulan');
-
         const select = document.getElementById('selectBulan');
 
         if (checkbox.checked) {
-
             select.disabled = false;
-
         } else {
-
             select.disabled = true;
-
             select.value = '';
-
             select.form.submit();
-
         }
-
     }
 
-
     /*
     |--------------------------------------------------------------------------
-    | DIAGRAM DONUT
+    | DIAGRAM DONUT: STATUS PEMBAYARAN
     |--------------------------------------------------------------------------
     */
+    const paymentCanvas = document.getElementById('paymentChart');
 
-    const paymentChart =
-        document.getElementById('paymentChart');
-
-
-    new Chart(paymentChart, {
-
-        type: 'doughnut',
-
-        data: {
-
-            labels: [
-                'Sudah Bayar',
-                'Belum Bayar'
-            ],
-
-            datasets: [{
-
-                data: [
-                    {{ $sudahBayar }},
-                    {{ $belumBayar }}
-                ]
-
-            }]
-
-        },
-
-        options: {
-
-            responsive: true,
-
-            maintainAspectRatio: false,
-
-            plugins: {
-
-                legend: {
-
-                    position: 'bottom'
-
-                }
-
-            }
-
-        }
-
-    });
-
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | DIAGRAM BATANG
-    |--------------------------------------------------------------------------
-    */
-
-    const userChart =
-        document.getElementById('userChart');
-
-
-    new Chart(userChart, {
-
-        type: 'bar',
-
-        data: {
-
-            labels: [
-
-                @foreach($namaBulan as $nama)
-
-                    '{{ $nama }}',
-
-                @endforeach
-
-            ],
-
-            datasets: [{
-
-                label: 'Tunggakan Customer',
-
-                data: [
-
-                    @foreach($tunggakanPerBulan as $jumlah)
-
-                        {{ $jumlah }},
-
-                    @endforeach
-
-                ],
-
-                borderWidth: 1
-
-            }]
-
-        },
-
-        options: {
-
-            responsive: true,
-
-            maintainAspectRatio: false,
-
-            scales: {
-
-                y: {
-
-                    beginAtZero: true,
-
-                    ticks: {
-
-                        stepSize: 10
-
-                    }
-
-                }
-
+    if (paymentCanvas) {
+        new Chart(paymentCanvas, {
+            type: 'doughnut',
+            data: {
+                labels: ['Sudah Bayar', 'Belum Bayar'],
+                datasets: [{
+                    data: [
+                        @json($sudahBayar),
+                        @json($belumBayar)
+                    ],
+                    borderWidth: 1
+                }]
             },
-
-            plugins: {
-
-                legend: {
-
-                    display: false
-
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
                 }
-
             }
+        });
+    }
 
-        }
+    /*
+    |--------------------------------------------------------------------------
+    | DIAGRAM BATANG: TUNGGAKAN CUSTOMER
+    |--------------------------------------------------------------------------
+    */
+    const userCanvas = document.getElementById('userChart');
 
-    });
-
+    if (userCanvas) {
+        new Chart(userCanvas, {
+            type: 'bar',
+            data: {
+                labels: @json($diagramLabels),
+                datasets: [{
+                    label: 'Tunggakan Customer',
+                    data: @json($diagramData),
+                    borderWidth: 1,
+                    barThickness: {{ $showAll ? '40' : '25' }}
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
 </script>
 
 @endsection

@@ -10,13 +10,14 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        // Tahun yang dipilih
-        // Kalau belum memilih, otomatis menggunakan tahun sekarang.
-        $tahun = $request->input('tahun', now()->year);
+       // Tahun yang dipilih
+    $tahun = $request->input('tahun', now()->year);
 
-        // Bulan yang dipilih.
-        // Null berarti menggunakan bulan aktif sekarang.
+        // Bulan yang dipilih
         $bulan = $request->input('bulan');
+
+        // ALL = menampilkan semua data
+        $showAll = $request->boolean('all');
 
         $namaBulan = [
             1 => 'Januari',
@@ -33,6 +34,7 @@ class DashboardController extends Controller
             12 => 'Desember',
         ];
 
+        $diagramLabels = array_values($namaBulan);
 
         /*
         |--------------------------------------------------------------------------
@@ -40,12 +42,10 @@ class DashboardController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        // Jika user memilih bulan dari filter,
-        // gunakan bulan tersebut.
-        //
-        // Jika tidak memilih bulan,
-        // gunakan bulan aktif sekarang.
-        $periodeDashboard = $bulan ?? $namaBulan[now()->month];
+       // Jika ALL dipilih, tidak menggunakan satu periode tertentu.
+// Jika memilih bulan, gunakan bulan tersebut.
+// Jika tidak memilih apa-apa, gunakan bulan sekarang.
+$periodeDashboard = $bulan ?? $namaBulan[now()->month];
 
 
         /*
@@ -70,8 +70,13 @@ class DashboardController extends Controller
 
         $paymentQuery = Payment::where('tahun', $tahun);
 
-        if ($bulan) {
-            $paymentQuery->where('periode', $bulan);
+        // Jika bukan ALL, gunakan bulan yang dipilih.
+        // Jika tidak ada bulan yang dipilih, gunakan bulan sekarang.
+        if (!$showAll) {
+             $paymentQuery->where(
+             'periode',
+             $bulan ?? $namaBulan[now()->month]
+             );
         }
 
 
@@ -92,40 +97,53 @@ class DashboardController extends Controller
         */
 
         // Ambil customer yang memiliki paket.
-        $customers = Customer::whereNotNull('package_id')
-            ->with([
-                'payments' => function ($query) use ($tahun, $periodeDashboard) {
-                    $query
-                        ->where('tahun', $tahun)
-                        ->where('periode', $periodeDashboard);
-                }
-            ])
-            ->get();
+       $customers = Customer::whereNotNull('package_id')
+    ->with([
+        'payments' => function ($query) use ($tahun, $showAll, $periodeDashboard) {
 
+            $query->where('tahun', $tahun);
 
-        $sudahBayar = 0;
-        $belumBayar = 0;
-
-
-        foreach ($customers as $customer) {
-
-            // Payment customer pada periode dashboard
-            $payment = $customer->payments->first();
-
-            // Jika ada payment dan statusnya lunas
-            if ($payment && $payment->status === 'lunas') {
-
-                $sudahBayar++;
-
-            }
-
-            // Jika ada payment tetapi belum lunas
-            elseif ($payment && $payment->status === 'belum_bayar') {
-
-                $belumBayar++;
-
+            // Jika bukan ALL, gunakan periode yang dipilih
+            if (!$showAll) {
+                $query->where('periode', $periodeDashboard);
             }
         }
+    ])
+    ->get();
+
+
+       $sudahBayar = 0;
+$belumBayar = 0;
+
+foreach ($customers as $customer) {
+
+    if ($showAll) {
+
+        // ALL: cek seluruh payment customer pada tahun tersebut
+        $hasLunas = $customer->payments
+            ->contains('status', 'lunas');
+
+        $hasBelumBayar = $customer->payments
+            ->contains('status', 'belum_bayar');
+
+        if ($hasLunas) {
+            $sudahBayar++;
+        } elseif ($hasBelumBayar) {
+            $belumBayar++;
+        }
+
+    } else {
+
+        // Jika memilih bulan tertentu
+        $payment = $customer->payments->first();
+
+        if ($payment && $payment->status === 'lunas') {
+            $sudahBayar++;
+        } elseif ($payment && $payment->status === 'belum_bayar') {
+            $belumBayar++;
+        }
+    }
+}
 
 
         /*
@@ -178,6 +196,30 @@ class DashboardController extends Controller
                 ->count('customer_id');
         }
 
+        /*
+|--------------------------------------------------------------------------
+| DATA DIAGRAM
+|--------------------------------------------------------------------------
+*/
+
+if ($showAll) {
+
+    // ALL: tampilkan seluruh bulan
+    $diagramLabels = array_values($namaBulan);
+    $diagramData = $tunggakanPerBulan;
+
+} else {
+
+    // Bulan sekarang / bulan yang dipilih:
+    // tampilkan hanya satu bulan
+    $diagramLabels = [$periodeDashboard];
+
+    $indexBulan = array_search($periodeDashboard, $namaBulan);
+
+    $diagramData = [
+        $tunggakanPerBulan[$indexBulan - 1] ?? 0
+    ];
+}
 
         /*
         |--------------------------------------------------------------------------
@@ -199,18 +241,22 @@ class DashboardController extends Controller
 
 
         return view('dashboard', compact(
-            'tahun',
-            'bulan',
-            'namaBulan',
-            'totalUser',
-            'totalTagihan',
-            'sudahBayar',
-            'belumBayar',
-            'tunggakanPerBulan',
-            'tagihanPerBulan',
-            'lunasPerBulan',
-            'belumBayarPerBulan',
-            'tahunList'
-        ));
+        'tahun',
+        'bulan',
+        'showAll',
+        'periodeDashboard',
+        'namaBulan',
+        'diagramLabels',
+        'diagramData',
+        'totalUser',
+        'totalTagihan',
+        'sudahBayar',
+        'belumBayar',
+        'tunggakanPerBulan',
+        'tagihanPerBulan',
+        'lunasPerBulan',
+        'belumBayarPerBulan',
+        'tahunList'
+    ));
     }
 }

@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends(Auth::user()->role === 'owner' ? 'owner.layout' : 'layouts.admin')
 
 @section('content')
 
@@ -69,27 +69,27 @@
                 @csrf
 
 
-                {{-- KODE PELANGGAN --}}
-                <div class="mb-3">
+              {{-- KODE PELANGGAN --}}
+<div class="mb-3">
 
-                    <label for="kode_pelanggan"
-                           class="form-label fw-semibold">
+    <label for="kode_pelanggan"
+           class="form-label fw-semibold">
 
-                        Kode Pelanggan
+        Kode Pelanggan
 
-                    </label>
+    </label>
 
-                    <input
-                        type="text"
-                        id="kode_pelanggan"
-                        name="kode_pelanggan"
-                        class="form-control"
-                        placeholder="Contoh: CUST001"
-                        value="{{ old('kode_pelanggan') }}"
-                        required
-                    >
+    <input
+        type="text"
+        id="kode_pelanggan"
+        name="kode_pelanggan"
+        class="form-control"
+        placeholder="Contoh: CUST001"
+        value="{{ old('kode_pelanggan') }}"
+        required
+    >
 
-                </div>
+</div>
 
 
                 {{-- NAMA --}}

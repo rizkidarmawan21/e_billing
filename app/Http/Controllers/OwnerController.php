@@ -28,42 +28,74 @@ class OwnerController extends Controller
             10 => 'Oktober',
             11 => 'November',
             12 => 'Desember',
+    
         ];
+        $tahun = now()->year;
 
-        // ==========================================
-        // FILTER BULAN
-        // ==========================================
 
-        $filterActive = $request->boolean('filter_active');
+    // ======================================================
+// FILTER DASHBOARD
+// ======================================================
 
-        $selectedMonths = $request->input('months', []);
+// ALL = semua data
+$showAll = $request->boolean('all');
 
-        // Pastikan selalu berupa array
-        if (!is_array($selectedMonths)) {
-            $selectedMonths = [$selectedMonths];
-        }
+// Filter bulan dari form
+$filterActive = $request->boolean('filter_active');
 
-        // Hanya izinkan nama bulan yang tersedia
-        $selectedMonths = array_values(
-            array_intersect($selectedMonths, array_values($namaBulan))
-        );
+$selectedMonths = $request->input('months', []);
 
-        // ==========================================
-        // QUERY PAYMENT
-        // ==========================================
+if (!is_array($selectedMonths)) {
+    $selectedMonths = [$selectedMonths];
+}
 
-        $paymentQuery = Payment::query();
+// Pastikan hanya nama bulan yang valid
+$selectedMonths = array_values(
+    array_intersect($selectedMonths, array_values($namaBulan))
+);
 
-        // Filter hanya diterapkan jika:
-        // 1. Filter diaktifkan
-        // 2. Ada bulan yang dipilih
-        if ($filterActive && !empty($selectedMonths)) {
-            $paymentQuery->whereIn('periode', $selectedMonths);
-        }
+
+// ======================================================
+// QUERY PAYMENT
+// ======================================================
+
+$paymentQuery = Payment::query();
+
+
+// Jika ALL dipilih
+if ($showAll) {
+
+    // Tidak ada filter bulan
+    // Semua data ditampilkan
+
+}
+
+
+// Jika tidak ALL dan ada Filter Bulan
+elseif ($filterActive && !empty($selectedMonths)) {
+
+    $paymentQuery
+        ->where('tahun', now()->year)
+        ->whereIn('periode', $selectedMonths);
+
+}
+
+
+// Jika tidak ALL dan tidak ada Filter Bulan
+else {
+
+    // Default = bulan berjalan
+    $paymentQuery
+        ->where('tahun', now()->year)
+        ->where('periode', $namaBulan[now()->month]);
+
+}
 
         // ==========================================
         // DATA STATISTIK
         // ==========================================
+
+        // TOTAL USER
 
         $totalUsers = Customer::count();
 
@@ -74,43 +106,132 @@ class OwnerController extends Controller
             ->where('status', 'lunas')
             ->sum('jumlah_tagihan');
 
-        $sudahBayar = (clone $paymentQuery)
-            ->where('status', 'lunas')
-            ->count();
+     
 
-        $belumBayar = (clone $paymentQuery)
-            ->where('status', 'belum_bayar')
-            ->count();
+
+// ==========================================
+// STATUS PEMBAYARAN
+// ==========================================
+
+$sudahBayar = (clone $paymentQuery)
+    ->where('status', 'lunas')
+    ->distinct('customer_id')
+    ->count('customer_id');
+
+$belumBayar = (clone $paymentQuery)
+    ->where('status', 'belum_bayar')
+    ->distinct('customer_id')
+    ->count('customer_id');
 
         $piutang = (clone $paymentQuery)
             ->where('status', 'belum_bayar')
             ->sum('jumlah_tagihan');
 
-        // ==========================================
-        // DATA GRAFIK PENDAPATAN
-        // ==========================================
+// ======================================================
+// DATA GRAFIK PENDAPATAN PER BULAN
+// ======================================================
 
-        $pendapatanPerBulan = [];
+$pendapatanPerBulan = [];
 
-        for ($bulan = 1; $bulan <= 12; $bulan++) {
+for ($bulan = 1; $bulan <= 12; $bulan++) {
 
-            $query = Payment::where('tahun', now()->year)
-                ->where('status', 'lunas');
+    // ALL = tampilkan semua bulan
+    if ($showAll) {
 
-            // Jika filter aktif dan bulan tersebut
-            // tidak dipilih, nilainya dibuat 0
-            if ($filterActive && !empty($selectedMonths)) {
+        $pendapatanPerBulan[] = Payment::query()
+            ->where('tahun', now()->year)
+            ->where('periode', $namaBulan[$bulan])
+            ->where('status', 'lunas')
+            ->sum('jumlah_tagihan');
 
-                if (!in_array($namaBulan[$bulan], $selectedMonths)) {
-                    $pendapatanPerBulan[] = 0;
-                    continue;
-                }
-            }
+    }
 
-            $pendapatanPerBulan[] = $query
+    // Filter bulan aktif dan ada bulan yang dipilih
+    elseif ($filterActive && !empty($selectedMonths)) {
+
+        if (in_array($namaBulan[$bulan], $selectedMonths)) {
+
+            $pendapatanPerBulan[] = Payment::query()
+                ->where('tahun', now()->year)
                 ->where('periode', $namaBulan[$bulan])
+                ->where('status', 'lunas')
                 ->sum('jumlah_tagihan');
+
+        } else {
+
+            $pendapatanPerBulan[] = 0;
+
         }
+
+    }
+
+    // Default = bulan berjalan saja
+    else {
+
+        if ($bulan == now()->month) {
+
+            $pendapatanPerBulan[] = Payment::query()
+                ->where('tahun', now()->year)
+                ->where('periode', $namaBulan[$bulan])
+                ->where('status', 'lunas')
+                ->sum('jumlah_tagihan');
+
+        } else {
+
+            $pendapatanPerBulan[] = 0;
+
+        }
+    }
+}
+
+// ======================================================
+// DATA TUNGGAKAN CUSTOMER PER BULAN
+// ======================================================
+
+$tunggakanPerBulan = [];
+
+for ($bulan = 1; $bulan <= 12; $bulan++) {
+
+    $nama = $namaBulan[$bulan];
+
+    // ALL: hitung tunggakan setiap bulan
+    if ($showAll) {
+        $jumlahTunggakan = Payment::where('tahun', now()->year)
+            ->where('periode', $nama)
+            ->where('status', 'belum_bayar')
+            ->distinct('customer_id')
+            ->count('customer_id');
+    }
+
+    // Filter bulan: hitung hanya bulan yang dipilih
+    elseif ($filterActive && !empty($selectedMonths)) {
+        if (in_array($nama, $selectedMonths)) {
+            $jumlahTunggakan = Payment::where('tahun', now()->year)
+                ->where('periode', $nama)
+                ->where('status', 'belum_bayar')
+                ->distinct('customer_id')
+                ->count('customer_id');
+        } else {
+            $jumlahTunggakan = 0;
+        }
+    }
+
+    // Default: hanya bulan berjalan
+    else {
+        if ($bulan == now()->month) {
+            $jumlahTunggakan = Payment::where('tahun', now()->year)
+                ->where('periode', $nama)
+                ->where('status', 'belum_bayar')
+                ->distinct('customer_id')
+                ->count('customer_id');
+        } else {
+            $jumlahTunggakan = 0;
+        }
+    }
+
+    $tunggakanPerBulan[] = $jumlahTunggakan;
+}
+
 
         // ==========================================
         // STATUS PEMBAYARAN
@@ -148,10 +269,13 @@ foreach ($paketList as $paket) {
             'filterActive',
             'selectedMonths',
             'namaBulan',
+            'tahun',
             'pendapatanPerBulan',
+            'tunggakanPerBulan',
             'statusPembayaran',
             'distribusiPaket',
-            'tagihanVsPendapatan'
+            'tagihanVsPendapatan',
+            'showAll'
         ));
     }
       public function laporan(Request $request)
@@ -236,13 +360,46 @@ $pendapatan = (clone $query)
     ->where('status', 'lunas')
     ->sum('jumlah_tagihan');
 
-$sudahBayar = (clone $query)
-    ->where('status', 'lunas')
-    ->count();
+// ==========================================
+// STATUS PEMBAYARAN CUSTOMER
+// ==========================================
 
-$belumBayar = (clone $query)
-    ->where('status', 'belum_bayar')
-    ->count();
+// Customer yang memiliki tagihan pada periode terpilih
+$customerIds = (clone $paymentQuery)
+    ->distinct()
+    ->pluck('customer_id');
+
+// Hitung customer yang semua tagihannya lunas
+$sudahBayar = 0;
+$belumBayar = 0;
+
+foreach ($customerIds as $customerId) {
+    $tagihanCustomer = (clone $paymentQuery)
+        ->where('customer_id', $customerId);
+
+    $adaTunggakan = (clone $tagihanCustomer)
+        ->where('status', 'belum_bayar')
+        ->exists();
+
+    if ($adaTunggakan) {
+        $belumBayar++;
+    } else {
+        $sudahBayar++;
+    }
+}
+
+dd([
+    'total_customer' => Customer::count(),
+    'customer_dengan_tagihan' => $customerIds->count(),
+    'jumlah_tagihan_lunas' => (clone $paymentQuery)
+        ->where('status', 'lunas')
+        ->count(),
+    'jumlah_tagihan_belum_bayar' => (clone $paymentQuery)
+        ->where('status', 'belum_bayar')
+        ->count(),
+    'customer_lunas' => $sudahBayar,
+    'customer_belum_bayar' => $belumBayar,
+]);
 
 $piutang = (clone $query)
     ->where('status', 'belum_bayar')
