@@ -410,16 +410,14 @@
         </div>
 
 
-        {{-- PAGINATION --}}
-        @if ($customers->hasPages())
-
-            <div class="card-footer bg-white">
-
-                {{ $customers->links() }}
-
-            </div>
-
-        @endif
+       {{-- PAGINATION --}}
+@if ($customers->hasPages())
+    <div class="card-footer bg-white">
+        <div class="payment-pagination">
+           {{ $customers->onEachSide(1)->links('pagination::bootstrap-5') }}
+        </div>
+    </div>
+@endif
 
     </div>
 
