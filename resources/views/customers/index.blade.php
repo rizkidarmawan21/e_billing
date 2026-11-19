@@ -309,18 +309,19 @@
 
         </div>
 
-
         <!-- PAGINATION -->
         @if($customers->hasPages())
 
             <div class="card-footer bg-white border-0 py-3">
 
-                {{ $customers->links() }}
+                <div class="payment-pagination">
+                    {{ $customers->onEachSide(1)->links('pagination::bootstrap-5') }}
+                </div>
 
             </div>
 
         @endif
 
-    </div>
+    </div> {{-- Penutup card tabel Customer --}}
 
 @endsection

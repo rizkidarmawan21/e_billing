@@ -1,1 +1,66 @@
 /* Bootstrap digunakan sebagai framework utama */
+
+/* Pagination Payment */
+.payment-pagination .pagination {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 2px;
+    width: auto;
+    margin: 0;
+    padding: 0;
+}
+
+.payment-pagination .page-item {
+    flex: 0 0 auto;
+}
+
+/* Menghilangkan tombol Previous dan Next */
+.payment-pagination li:has(> a[rel="prev"]),
+.payment-pagination li:has(> a[rel="next"]),
+.payment-pagination li:has(> span[aria-hidden="true"]) {
+    display: none !important;
+}
+
+/* Ukuran nomor halaman */
+.payment-pagination .page-link {
+    padding: 6px 10px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Mencegah ikon membesar */
+.payment-pagination svg {
+    width: 14px !important;
+    height: 14px !important;
+    max-width: 14px !important;
+    max-height: 14px !important;
+}
+
+/* Menghilangkan tombol panah besar pagination Payment */
+.payment-pagination li:has(a[rel="prev"]),
+.payment-pagination li:has(a[rel="next"]),
+.payment-pagination li:has(.page-link svg) {
+    display: none !important;
+}
+
+/* Menjaga nomor halaman tetap normal */
+.payment-pagination .pagination {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 2px;
+    width: auto;
+    margin: 0;
+    padding: 0;
+}
+
+.payment-pagination .page-link {
+    width: auto !important;
+    height: auto !important;
+    padding: 6px 10px;
+    font-size: 14px;
+    line-height: 1.5;
+}
