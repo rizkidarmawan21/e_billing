@@ -343,12 +343,12 @@
 
                                         {{-- AKSI --}}
                                        <td class="text-center">
-    <a href="{{ route('payments.edit', array_merge(['payment' => $history], request()->query())) }}"
+    <a href="{{ route('payments.edit', array_merge(['payment' => $history], request()->except('payment'))) }}"
        class="btn btn-sm btn-warning me-1">
         Edit
     </a>
 
-    <form action="{{ route('payments.destroy', array_merge(['payment' => $history], request()->query())) }}"
+    <form action="{{ route('payments.destroy', array_merge(['payment' => $history], request()->except('payment'))) }}"
           method="POST"
           class="d-inline"
           onsubmit="return confirm('Yakin ingin menghapus riwayat pembayaran {{ $history->periode }} {{ $history->tahun }}?');">
@@ -410,7 +410,7 @@
 
             <div class="d-flex gap-2">
 
-                <a href="{{ route('payments.edit', array_merge(['payment' => $payment], request()->query())) }}"
+                <a href="{{ route('payments.edit', array_merge(['payment' => $payment], request()->except('payment'))) }}"
                    class="btn btn-warning">
 
                     ✏️ Edit Payment
@@ -418,7 +418,7 @@
                 </a>
 
 
-                <form action="{{ route('payments.destroy', array_merge(['payment' => $payment], request()->query())) }}"
+                <form action="{{ route('payments.destroy', array_merge(['payment' => $payment], request()->except('payment'))) }}"
                       method="POST"
                       class="d-inline"
                       onsubmit="return confirm('Yakin ingin menghapus payment ini?');">

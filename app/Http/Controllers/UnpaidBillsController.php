@@ -22,7 +22,7 @@ class UnpaidBillsController extends Controller
         $monthSql = 'CASE payments.periode '.collect($months)->map(fn ($name, $number) => "WHEN '$name' THEN $number")->implode(' ').' ELSE 0 END';
         $query = Payment::query()->join('customers', 'customers.id', '=', 'payments.customer_id')
             ->where('payments.status', 'belum_bayar')
-            ->when($filters['search'] ?? null, fn ($q, $search) => $q->where('customers.nama', 'like', '%'.$search.'%'));
+            ->when(isset($filters['search']) && $filters['search'] !== '', fn ($q) => $q->where('customers.nama', 'like', '%'.$filters['search'].'%'));
         $preset = $filters['preset'] ?? 'all';
         if ($preset === 'current' || $preset === 'month') {
             $date = $preset === 'current' ? now()->format('Y-m') : $filters['month'];

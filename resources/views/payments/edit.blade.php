@@ -57,7 +57,7 @@
             @endif
 
 
-            <form action="{{ route('payments.update', array_merge(['payment' => $payment], request()->query())) }}"
+            <form action="{{ route('payments.update', $payment) }}?{{ http_build_query(request()->except('payment')) }}"
                   method="POST">
 
                 @csrf
