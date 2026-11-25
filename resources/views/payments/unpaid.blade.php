@@ -1,4 +1,4 @@
-@extends(Auth::user()->role === 'owner' ? 'owner.layout' : 'layouts.admin')
+@extends('owner.layout')
 
 @section('header', 'Tagihan Belum Dibayar')
 

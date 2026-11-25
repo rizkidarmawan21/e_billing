@@ -13,7 +13,7 @@ class UnpaidBillsTest extends TestCase
 
     public function test_unpaid_page_shows_all_unpaid_bills_and_summary(): void
     {
-        $user = User::factory()->create(['role' => 'admin']);
+        $user = User::factory()->create(['role' => 'owner']);
         $package = DB::table('packages')->insertGetId(['nama_paket' => 'Test', 'kecepatan' => '10 Mbps', 'harga' => 100]);
         $customer = DB::table('customers')->insertGetId(['kode_pelanggan' => 'TEST', 'nama' => 'Test Customer', 'no_hp' => '123', 'alamat' => 'Test', 'package_id' => $package]);
         foreach ([['Desember', 2023, 100, 'belum_bayar'], ['Januari', 2025, 200, 'belum_bayar'], ['Februari', 2025, 900, 'lunas']] as [$month, $year, $amount, $status]) {
@@ -40,7 +40,7 @@ class UnpaidBillsTest extends TestCase
         $this->bill('Januari', 2025, 200, name: 'Budi');
         $this->bill('Februari', 2025, 300, name: 'Andi');
         $this->bill('Januari', 2025, 900, 'lunas');
-        $this->actingAs(User::factory()->create(['role' => 'admin']));
+        $this->actingAs(User::factory()->create(['role' => 'owner']));
 
         $this->get('/payments/unpaid?preset=current')->assertOk()->assertViewHas('count', 1)->assertViewHas('total', 200);
         $this->get('/payments/unpaid?preset=month&month=2025-02')->assertOk()->assertViewHas('count', 1)->assertViewHas('total', 300);
@@ -53,7 +53,8 @@ class UnpaidBillsTest extends TestCase
     {
         $this->get('/payments/unpaid')->assertRedirect('/login');
         $this->actingAs(User::factory()->create(['role' => 'guest']))->get('/payments/unpaid')->assertForbidden();
-        $this->actingAs(User::factory()->create(['role' => 'admin']));
+        $this->actingAs(User::factory()->create(['role' => 'admin']))->get('/payments/unpaid')->assertForbidden();
+        $this->actingAs(User::factory()->create(['role' => 'owner']));
         foreach (range(1, 11) as $i) {
             $this->bill('Januari', 2025, 100, name: 'Budi '.$i);
         }
@@ -83,7 +84,7 @@ class UnpaidBillsTest extends TestCase
     {
         $first = $this->bill('Januari', 2025);
         $second = $this->bill('Februari', 2025);
-        $this->actingAs(User::factory()->create(['role' => 'admin']));
+        $this->actingAs(User::factory()->create(['role' => 'owner']));
         $url = '/payments/unpaid?preset=range&start=2025-01&end=2025-02';
         $this->get($url)->assertSee('/payments/'.$first.'/edit?preset=range');
         $this->delete('/payments/'.$first, ['from_unpaid' => '1', 'preset' => 'range', 'start' => '2025-01', 'end' => '2025-02'])->assertRedirect($url);

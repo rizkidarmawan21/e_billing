@@ -90,7 +90,7 @@ Route::delete('/owner/admin/{user}', [OwnerAdminController::class, 'destroy'])
     ->name('owner.admin.destroy');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/payments/unpaid', [UnpaidBillsController::class, 'index'])->middleware('role:owner,admin')->name('payments.unpaid');
+    Route::get('/payments/unpaid', [UnpaidBillsController::class, 'index'])->middleware('role:owner')->name('payments.unpaid');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

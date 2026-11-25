@@ -65,7 +65,12 @@
             </a>
 
 
-            <a href="{{ route('payments.unpaid') }}" class="nav-link text-white rounded px-3 py-3">Tagihan Belum Dibayar</a>
+            <a href="{{ route('payments.unpaid') }}"
+               class="nav-link text-white rounded px-3 py-3 {{ request()->routeIs('payments.unpaid') ? 'bg-white bg-opacity-25' : '' }}"
+               @if(request()->routeIs('payments.unpaid')) aria-current="page" @endif>
+                🧾
+                <span class="ms-2">Tagihan Belum Bayar</span>
+            </a>
 
             {{-- PAYMENT --}}
             <a href="{{ route('payments.index') }}"
