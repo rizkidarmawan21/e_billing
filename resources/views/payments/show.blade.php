@@ -22,7 +22,7 @@
         </div>
 
 
-        <a href="{{ route('payments.index') }}"
+        <a href="{{ (request('from_unpaid') === '1' ? route('payments.unpaid', request()->except('from_unpaid')) : route('payments.index')) }}"
            class="btn btn-secondary">
 
             ← Kembali
@@ -343,12 +343,12 @@
 
                                         {{-- AKSI --}}
                                        <td class="text-center">
-    <a href="{{ route('payments.edit', $history) }}"
+    <a href="{{ route('payments.edit', array_merge(['payment' => $history], request()->query())) }}"
        class="btn btn-sm btn-warning me-1">
         Edit
     </a>
 
-    <form action="{{ route('payments.destroy', $history) }}"
+    <form action="{{ route('payments.destroy', array_merge(['payment' => $history], request()->query())) }}"
           method="POST"
           class="d-inline"
           onsubmit="return confirm('Yakin ingin menghapus riwayat pembayaran {{ $history->periode }} {{ $history->tahun }}?');">
@@ -410,7 +410,7 @@
 
             <div class="d-flex gap-2">
 
-                <a href="{{ route('payments.edit', $payment) }}"
+                <a href="{{ route('payments.edit', array_merge(['payment' => $payment], request()->query())) }}"
                    class="btn btn-warning">
 
                     ✏️ Edit Payment
@@ -418,7 +418,7 @@
                 </a>
 
 
-                <form action="{{ route('payments.destroy', $payment) }}"
+                <form action="{{ route('payments.destroy', array_merge(['payment' => $payment], request()->query())) }}"
                       method="POST"
                       class="d-inline"
                       onsubmit="return confirm('Yakin ingin menghapus payment ini?');">

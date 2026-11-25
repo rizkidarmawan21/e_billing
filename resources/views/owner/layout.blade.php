@@ -65,6 +65,8 @@
             </a>
 
 
+            <a href="{{ route('payments.unpaid') }}" class="nav-link text-white rounded px-3 py-3">Tagihan Belum Dibayar</a>
+
             {{-- PAYMENT --}}
             <a href="{{ route('payments.index') }}"
                class="nav-link text-white rounded px-3 py-3">

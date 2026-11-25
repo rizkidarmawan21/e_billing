@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends(Auth::user()->role === 'owner' ? 'owner.layout' : 'layouts.admin')
 
 @section('content')
 
@@ -17,7 +17,7 @@
             </p>
         </div>
 
-        <a href="{{ route('payments.index') }}"
+        <a href="{{ (request('from_unpaid') === '1' ? route('payments.unpaid', request()->except('from_unpaid')) : route('payments.index')) }}"
            class="btn btn-secondary">
             ← Kembali
         </a>
@@ -57,7 +57,7 @@
             @endif
 
 
-            <form action="{{ route('payments.update', $payment) }}"
+            <form action="{{ route('payments.update', array_merge(['payment' => $payment], request()->query())) }}"
                   method="POST">
 
                 @csrf
@@ -317,7 +317,7 @@
 
 
                     <a
-                        href="{{ route('payments.index') }}"
+                        href="{{ (request('from_unpaid') === '1' ? route('payments.unpaid', request()->except('from_unpaid')) : route('payments.index')) }}"
                         class="btn btn-secondary"
                     >
                         Batal
