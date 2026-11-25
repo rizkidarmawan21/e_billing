@@ -80,6 +80,11 @@ class UnpaidBillsTest extends TestCase
             ($n <= 10 ? $second : $first)->assertDontSee($name);
         }
         $first->assertDontSee('Paid Sample')->assertDontSee('Outside Sample')->assertSee('page=2');
+        foreach ([$first, $second] as $page) {
+            $page->assertSee('<ul class="pagination">', false)
+                ->assertSee('&laquo; Previous', false)->assertSee('Next &raquo;', false)->assertDontSee('<svg', false)
+                ->assertDontSee('Showing', false)->assertDontSee('d-sm-none', false);
+        }
         $second->assertSee('Rp 1.100')->assertSee('Rp 1.200');
     }
 

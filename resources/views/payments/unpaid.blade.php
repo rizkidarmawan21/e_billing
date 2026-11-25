@@ -26,6 +26,6 @@
         @empty
             <tr><td colspan="6" class="text-center py-5"><strong>Tidak ada tagihan belum dibayar</strong><div class="text-muted">Ubah filter atau tampilkan semua periode.</div><a class="btn btn-sm btn-outline-primary mt-2" href="{{ route('payments.unpaid') }}">Hapus filter</a></td></tr>
         @endforelse
-    </tbody></table></div><div class="card-body">{{ $payments->links() }}</div></div>
+    </tbody></table></div><div class="card-body">{{ $payments->links('pagination::simple-bootstrap-5') }}</div></div>
 </div>
 @endsection
