@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 
 class PaymentController extends Controller
 {
@@ -286,6 +287,15 @@ if ($request->status === 'lunas') {
      */
     public function update(Request $request, Payment $payment)
     {
+        $returnFilters = Validator::make($request->query(), [
+            'preset' => ['nullable', Rule::in(['all', 'current', 'month', 'range'])],
+            'month' => ['nullable', 'date_format:Y-m'],
+            'start' => ['nullable', 'date_format:Y-m'],
+            'end' => ['nullable', 'date_format:Y-m', 'after_or_equal:start'],
+            'search' => ['nullable', 'string', 'max:255'],
+            'page' => ['nullable', 'integer', 'min:1'],
+        ])->validate();
+        $returnUrl = $request->user()->role === 'owner' && $request->query('from_unpaid') === '1' ? route('payments.unpaid', $returnFilters) : route('payments.index');
 
 if ($request->status === 'lunas') {
     $request->merge([
@@ -319,20 +329,26 @@ if ($request->status === 'lunas') {
 
         $payment->update($validated);
 
-        return redirect()
-            ->route('payments.index')
+        return redirect($returnUrl)
             ->with('success', 'Tagihan berhasil diperbarui.');
     }
 
     /**
      * Menghapus tagihan.
      */
-    public function destroy(Payment $payment)
+    public function destroy(Request $request, Payment $payment)
     {
+        $filters = Validator::make($request->all(), [
+            'preset' => ['nullable', Rule::in(['all', 'current', 'month', 'range'])],
+            'month' => ['nullable', 'date_format:Y-m'],
+            'start' => ['nullable', 'date_format:Y-m'],
+            'end' => ['nullable', 'date_format:Y-m', 'after_or_equal:start'],
+            'search' => ['nullable', 'string', 'max:255'],
+            'page' => ['nullable', 'integer', 'min:1'],
+        ])->validate();
         $payment->delete();
 
-        return redirect()
-            ->route('payments.index')
+        return redirect($request->user()->role === 'owner' && $request->input('from_unpaid') === '1' ? route('payments.unpaid', $filters) : route('payments.index'))
             ->with('success', 'Tagihan berhasil dihapus.');
     }
 }

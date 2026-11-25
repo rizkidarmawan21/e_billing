@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\UnpaidBillsController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\OwnerAdminController;
 use Illuminate\Support\Facades\DB;
@@ -89,6 +90,7 @@ Route::delete('/owner/admin/{user}', [OwnerAdminController::class, 'destroy'])
     ->name('owner.admin.destroy');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/payments/unpaid', [UnpaidBillsController::class, 'index'])->middleware('role:owner')->name('payments.unpaid');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -100,7 +102,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/payments/generate-monthly', [PaymentController::class, 'generateMonthly'])
     ->name('payments.generate-monthly');
     
-    Route::resource('payments', PaymentController::class);
+    Route::resource('payments', PaymentController::class)->middleware('role:owner,admin');
 });
 
 require __DIR__.'/auth.php';
