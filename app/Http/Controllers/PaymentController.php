@@ -288,10 +288,9 @@ if ($request->status === 'lunas') {
     public function update(Request $request, Payment $payment)
     {
         $returnFilters = Validator::make($request->query(), [
-            'preset' => ['nullable', Rule::in(['all', 'current', 'month', 'range'])],
-            'month' => ['nullable', 'date_format:Y-m'],
-            'start' => ['nullable', 'date_format:Y-m'],
-            'end' => ['nullable', 'date_format:Y-m', 'after_or_equal:start'],
+            'filter_active' => ['nullable', 'boolean'],
+            'months' => ['nullable', 'array'],
+            'months.*' => ['string', Rule::in(['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'])],
             'search' => ['nullable', 'string', 'max:255'],
             'page' => ['nullable', 'integer', 'min:1'],
         ])->validate();
@@ -339,10 +338,9 @@ if ($request->status === 'lunas') {
     public function destroy(Request $request, Payment $payment)
     {
         $filters = Validator::make($request->all(), [
-            'preset' => ['nullable', Rule::in(['all', 'current', 'month', 'range'])],
-            'month' => ['nullable', 'date_format:Y-m'],
-            'start' => ['nullable', 'date_format:Y-m'],
-            'end' => ['nullable', 'date_format:Y-m', 'after_or_equal:start'],
+            'filter_active' => ['nullable', 'boolean'],
+            'months' => ['nullable', 'array'],
+            'months.*' => ['string', Rule::in(['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'])],
             'search' => ['nullable', 'string', 'max:255'],
             'page' => ['nullable', 'integer', 'min:1'],
         ])->validate();
