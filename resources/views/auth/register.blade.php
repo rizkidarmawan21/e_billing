@@ -1,14 +1,11 @@
 <x-guest-layout>
+    <x-ui.page-header :title="__('Register')" />
 
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
         <!-- Name -->
-        <div class="mb-3">
-            <label for="name" class="form-label fw-semibold">
-                Name
-            </label>
-
+        <x-ui.field name="name" label="Name" :required="true">
             <input
                 id="name"
                 type="text"
@@ -20,19 +17,10 @@
                 autocomplete="name"
             >
 
-            @error('name')
-                <div class="text-danger small mt-1">
-                    {{ $message }}
-                </div>
-            @enderror
-        </div>
+        </x-ui.field>
 
         <!-- Role -->
-        <div class="mb-3">
-            <label for="role" class="form-label fw-semibold">
-                Role
-            </label>
-
+        <x-ui.field name="role" label="Role" :required="true">
             <select
                 id="role"
                 name="role"
@@ -50,19 +38,10 @@
                 </option>
             </select>
 
-            @error('role')
-                <div class="text-danger small mt-1">
-                    {{ $message }}
-                </div>
-            @enderror
-        </div>
+        </x-ui.field>
 
         <!-- Email -->
-        <div class="mb-3">
-            <label for="email" class="form-label fw-semibold">
-                Email
-            </label>
-
+        <x-ui.field name="email" label="Email" :required="true">
             <input
                 id="email"
                 type="email"
@@ -73,12 +52,7 @@
                 autocomplete="username"
             >
 
-            @error('email')
-                <div class="text-danger small mt-1">
-                    {{ $message }}
-                </div>
-            @enderror
-        </div>
+        </x-ui.field>
 
         <!-- Password -->
 <div class="mb-3">
@@ -86,24 +60,7 @@
         Password
     </label>
 
-    <div class="input-group">
-        <input
-            id="password"
-            type="password"
-            name="password"
-            class="form-control"
-            required
-            autocomplete="new-password"
-        >
-
-        <button
-            type="button"
-            class="btn btn-outline-secondary"
-            onclick="togglePassword('password', 'passwordIcon')"
-        >
-            <i class="bi bi-eye" id="passwordIcon"></i>
-        </button>
-    </div>
+    <x-ui.password-input id="password" name="password" class="form-control" required autocomplete="new-password" />
 
     @error('password')
         <div class="text-danger small mt-1">
@@ -118,24 +75,7 @@
         Confirm Password
     </label>
 
-    <div class="input-group">
-        <input
-            id="password_confirmation"
-            type="password"
-            name="password_confirmation"
-            class="form-control"
-            required
-            autocomplete="new-password"
-        >
-
-        <button
-            type="button"
-            class="btn btn-outline-secondary"
-            onclick="togglePassword('password_confirmation', 'confirmPasswordIcon')"
-        >
-            <i class="bi bi-eye" id="confirmPasswordIcon"></i>
-        </button>
-    </div>
+    <x-ui.password-input id="password_confirmation" name="password_confirmation" class="form-control" required autocomplete="new-password" />
 
     @error('password_confirmation')
         <div class="text-danger small mt-1">
@@ -145,7 +85,7 @@
 </div>
 
         <!-- Tombol -->
-        <div class="d-flex justify-content-between align-items-center mt-4">
+        <x-ui.form-actions class="justify-content-sm-between mt-4">
 
             <a
                 href="{{ route('login') }}"
@@ -158,25 +98,8 @@
                 Register
             </button>
 
-        </div>
+        </x-ui.form-actions>
 
     </form>
-
-    <script>
-    function togglePassword(inputId, iconId) {
-        const input = document.getElementById(inputId);
-        const icon = document.getElementById(iconId);
-
-        if (input.type === 'password') {
-            input.type = 'text';
-            icon.classList.remove('bi-eye');
-            icon.classList.add('bi-eye-slash');
-        } else {
-            input.type = 'password';
-            icon.classList.remove('bi-eye-slash');
-            icon.classList.add('bi-eye');
-        }
-    }
-</script>
 
 </x-guest-layout>

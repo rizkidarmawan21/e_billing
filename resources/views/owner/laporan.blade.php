@@ -99,22 +99,6 @@
         font-size: 14px;
     }
 
-    .badge-status {
-        padding: 6px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-
-    .badge-lunas {
-        background: #e9f8ef;
-        color: #198754;
-    }
-
-    .badge-belum {
-        background: #fff4df;
-        color: #b77900;
-    }
 
     .pagination {
         margin-bottom: 0;
@@ -133,24 +117,15 @@
     }
 </style>
 
-<div class="container-fluid py-4">
+<div class="container-fluid px-0 py-3 py-sm-4">
 
     {{-- HEADER --}}
-    <div class="mb-4">
-        <h3 class="page-title mb-1">
-            <i class="bi bi-file-earmark-bar-graph me-2 text-primary"></i>
-            Laporan
-        </h3>
-
-        <p class="page-subtitle mb-0">
-            Ringkasan dan detail data tagihan serta pembayaran pelanggan.
-        </p>
-    </div>
+    <x-ui.page-header title="Laporan" description="Ringkasan dan detail data tagihan serta pembayaran pelanggan." />
 
 
     {{-- FILTER --}}
     <div class="card soft-card filter-card mb-4">
-        <div class="card-body p-4">
+        <div class="card-body p-3 p-sm-4">
 
             <div class="d-flex align-items-center mb-3">
                 <div class="summary-icon icon-blue me-3">
@@ -169,7 +144,7 @@
 
                 {{-- SEARCH --}}
                 <div class="mb-3">
-                    <label class="filter-label">
+                    <label for="laporanSearch" class="filter-label">
                         Cari Pelanggan
                     </label>
 
@@ -181,6 +156,7 @@
                         <input
                             type="text"
                             name="search"
+                            id="laporanSearch"
                             class="form-control"
                             placeholder="Cari berdasarkan nama atau kode pelanggan..."
                             value="{{ $search ?? '' }}"
@@ -193,18 +169,21 @@
                 <div class="row g-3 align-items-end">
 
                     {{-- PERIODE --}}
-                    <div class="col-lg-4">
+                    <div class="col-12 col-md-6 col-xl-4">
 
-                        <label class="filter-label">
+                        <label for="laporanPeriode" class="filter-label">
                             Periode
                         </label>
 
                         <div class="dropdown">
 
                             <button
-                                class="btn btn-outline-secondary dropdown-toggle w-100 text-start"
+                                class="btn btn-outline-secondary dropdown-toggle w-100 text-start text-wrap"
                                 type="button"
+                                id="laporanPeriode"
                                 data-bs-toggle="dropdown"
+                                data-bs-auto-close="outside"
+                                aria-expanded="false"
                             >
                                 <i class="bi bi-calendar3 me-2"></i>
 
@@ -215,7 +194,7 @@
                                 @endif
                             </button>
 
-                            <div class="dropdown-menu p-3 w-100"
+                            <div class="dropdown-menu filter-menu p-3 w-100"
                                  style="max-height: 280px; overflow-y: auto;">
 
                                 @foreach($namaBulan as $bulan)
@@ -249,13 +228,13 @@
 
 
                     {{-- TAHUN --}}
-                    <div class="col-lg-3">
+                    <div class="col-12 col-md-6 col-xl-2">
 
-                        <label class="filter-label">
+                        <label for="laporanTahun" class="filter-label">
                             Tahun
                         </label>
 
-                        <select name="tahun" class="form-select">
+                        <select name="tahun" id="laporanTahun" class="form-select">
 
                             <option value="">
                                 Semua Tahun
@@ -278,13 +257,13 @@
 
 
                     {{-- STATUS --}}
-                    <div class="col-lg-3">
+                    <div class="col-12 col-md-6 col-xl-3">
 
-                        <label class="filter-label">
+                        <label for="laporanStatus" class="filter-label">
                             Status Pembayaran
                         </label>
 
-                        <select name="status" class="form-select">
+                        <select name="status" id="laporanStatus" class="form-select">
 
                             <option value="">
                                 Semua Status
@@ -310,9 +289,9 @@
 
 
                     {{-- BUTTON --}}
-                    <div class="col-lg-2">
+                    <div class="col-12 col-md-6 col-xl-3">
 
-                        <div class="d-flex gap-2">
+                        <x-ui.form-actions>
 
                             <button
                                 type="submit"
@@ -327,10 +306,11 @@
                                 class="btn btn-light border"
                                 title="Reset Filter"
                             >
-                                <i class="bi bi-arrow-counterclockwise"></i>
+                                <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                                Reset
                             </a>
 
-                        </div>
+                        </x-ui.form-actions>
 
                     </div>
 
@@ -346,7 +326,7 @@
     <div class="row g-3 mb-4">
 
         {{-- TOTAL TAGIHAN --}}
-        <div class="col-xl col-md-6">
+        <div class="col-12 col-sm-6 col-xl-4">
 
             <div class="card summary-card h-100">
 
@@ -359,7 +339,7 @@
                                 Total Tagihan
                             </small>
 
-                            <h5 class="fw-bold mb-0 mt-1">
+                            <h5 class="fw-bold mb-0 mt-1 text-break">
                                 Rp {{ number_format($totalTagihan, 0, ',', '.') }}
                             </h5>
                         </div>
@@ -378,7 +358,7 @@
 
 
         {{-- PENDAPATAN --}}
-        <div class="col-xl col-md-6">
+        <div class="col-12 col-sm-6 col-xl-4">
 
             <div class="card summary-card h-100">
 
@@ -391,7 +371,7 @@
                                 Pendapatan
                             </small>
 
-                            <h5 class="fw-bold mb-0 mt-1 text-success">
+                            <h5 class="fw-bold mb-0 mt-1 text-success text-break">
                                 Rp {{ number_format($pendapatan, 0, ',', '.') }}
                             </h5>
                         </div>
@@ -410,7 +390,7 @@
 
 
         {{-- SUDAH BAYAR --}}
-        <div class="col-xl col-md-6">
+        <div class="col-12 col-sm-6 col-xl-4">
 
             <div class="card summary-card h-100">
 
@@ -442,7 +422,7 @@
 
 
         {{-- BELUM BAYAR --}}
-        <div class="col-xl col-md-6">
+        <div class="col-12 col-sm-6 col-xl-4">
 
             <div class="card summary-card h-100">
 
@@ -474,7 +454,7 @@
 
 
         {{-- PIUTANG --}}
-        <div class="col-xl col-md-6">
+        <div class="col-12 col-sm-6 col-xl-4">
 
             <div class="card summary-card h-100">
 
@@ -487,7 +467,7 @@
                                 Piutang
                             </small>
 
-                            <h5 class="fw-bold mb-0 mt-1 text-danger">
+                            <h5 class="fw-bold mb-0 mt-1 text-danger text-break">
                                 Rp {{ number_format($piutang, 0, ',', '.') }}
                             </h5>
                         </div>
@@ -512,9 +492,9 @@
 
         <div class="card-body p-0">
 
-            <div class="p-4 pb-3">
+            <div class="p-3 p-sm-4 pb-sm-3">
 
-                <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
 
                     <div>
                         <h6 class="fw-bold mb-1">
@@ -535,15 +515,15 @@
             </div>
 
 
-            <div class="table-responsive">
+            <div class="table-responsive" tabindex="0" role="region" aria-label="Laporan tagihan">
 
-                <table class="table table-hover mb-0">
+                <x-ui.table>
 
                     <thead>
 
                         <tr>
 
-                            <th class="ps-4">No</th>
+                            <th class="ps-4 text-center" scope="col">No.</th>
                             <th>Kode Pelanggan</th>
                             <th>Nama</th>
                             <th>Paket</th>
@@ -562,53 +542,39 @@
 
                             <tr>
 
-                                <td class="ps-4">
+                                <td data-label="No." class="ps-4">
                                     {{ $payments->firstItem() + $loop->index }}
                                 </td>
 
-                                <td>
+                                <td data-label="Kode Pelanggan">
                                     <span class="fw-semibold">
                                         {{ $payment->customer->kode_pelanggan ?? '-' }}
                                     </span>
                                 </td>
 
-                                <td>
+                                <td data-label="Nama">
                                     {{ $payment->customer->nama ?? '-' }}
                                 </td>
 
-                                <td>
+                                <td data-label="Paket">
                                     {{ $payment->package->nama_paket ?? '-' }}
                                 </td>
 
-                                <td>
+                                <td data-label="Periode">
                                     {{ $payment->periode }} {{ $payment->tahun }}
                                 </td>
 
-                                <td>
+                                <td data-label="Tagihan">
                                     Rp {{ number_format($payment->jumlah_tagihan, 0, ',', '.') }}
                                 </td>
 
-                                <td>
+                                <td data-label="Status">
 
-                                    @if($payment->status === 'lunas')
-
-                                        <span class="badge-status badge-lunas">
-                                            <i class="bi bi-check-circle me-1"></i>
-                                            Lunas
-                                        </span>
-
-                                    @else
-
-                                        <span class="badge-status badge-belum">
-                                            <i class="bi bi-clock me-1"></i>
-                                            Belum Bayar
-                                        </span>
-
-                                    @endif
+                                    <x-ui.payment-status :status="$payment->status" />
 
                                 </td>
 
-                                <td>
+                                <td data-label="Tanggal Bayar">
                                     {{ $payment->tanggal_bayar
                                         ? $payment->tanggal_bayar->format('d/m/Y')
                                         : '-' }}
@@ -622,13 +588,7 @@
 
                                 <td colspan="8" class="text-center py-5">
 
-                                    <div class="text-muted">
-
-                                        <i class="bi bi-inbox fs-2 d-block mb-2"></i>
-
-                                        Belum ada data laporan.
-
-                                    </div>
+                                    <x-ui.empty-state title="Belum ada data laporan" description="Tidak ada pembayaran yang sesuai dengan filter. Ubah atau reset filter untuk melihat data lain." />
 
                                 </td>
 
@@ -638,7 +598,7 @@
 
                     </tbody>
 
-                </table>
+                </x-ui.table>
 
             </div>
 
@@ -646,7 +606,7 @@
             {{-- PAGINATION --}}
             @if($payments->hasPages())
 
-                <div class="p-4">
+                <div class="p-3 p-sm-4">
 
                     {{ $payments->links() }}
 

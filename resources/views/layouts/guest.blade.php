@@ -11,9 +11,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="bg-light">
+<body class="billing-auth bg-light">
 
-    <div class="min-vh-100 d-flex align-items-center justify-content-center py-5">
+    <div class="min-vh-100 d-flex align-items-center justify-content-center px-3 py-4 py-md-5">
 
         <div class="w-100" style="max-width: 450px;">
 
@@ -27,11 +27,11 @@
 </div>
 
 <!-- Kotak Form -->
-<div class="bg-white shadow rounded-3 p-4">
+<main class="bg-white shadow rounded-3 p-3 p-sm-4">
 
     {{ $slot }}
 
-</div>
+</main>
 
         </div>
 

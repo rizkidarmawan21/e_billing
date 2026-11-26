@@ -15,17 +15,17 @@
 
         {{-- PASSWORD --}}
         <div class="mb-3">
-            <label for="password" class="form-label fw-semibold">
+            <label for="delete_password" class="form-label fw-semibold">
                 Password
             </label>
 
-            <input
-                id="password"
+            <x-ui.password-input
+                id="delete_password"
                 name="password"
-                type="password"
                 class="form-control"
                 placeholder="Masukkan password untuk konfirmasi"
-            >
+                autocomplete="current-password"
+            />
 
             @if ($errors->userDeletion->get('password'))
                 <div class="text-danger small mt-1">
@@ -34,10 +34,12 @@
             @endif
         </div>
 
+        <x-ui.form-actions>
         <button type="submit"
                 class="btn btn-danger px-4"
                 onclick="return confirm('Yakin ingin menghapus akun administrator ini?')">
             Hapus Akun
         </button>
+        </x-ui.form-actions>
     </form>
 </section>

@@ -5,7 +5,7 @@
 <div class="container-fluid">
 
     {{-- HEADER --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <x-ui.page-header>
 
         <div>
             <h4 class="fw-bold mb-1">
@@ -17,15 +17,16 @@
             </p>
         </div>
 
+        <x-slot:actions>
         <a href="{{ route('customers.index') }}"
-           class="btn btn-secondary">
+           class="btn btn-outline-secondary">
 
             ← Kembali
 
         </a>
 
-    </div>
-
+        </x-slot:actions>
+    </x-ui.page-header>
 
     {{-- PROFIL --}}
     <div class="card border-0 shadow-sm">
@@ -48,7 +49,7 @@
                             Kode Pelanggan
                         </div>
 
-                        <div class="col-sm-8 fw-semibold">
+                        <div class="col-sm-8 fw-semibold text-break">
                             {{ $customer->kode_pelanggan }}
                         </div>
 
@@ -61,7 +62,7 @@
                             Nama
                         </div>
 
-                        <div class="col-sm-8 fw-semibold">
+                        <div class="col-sm-8 fw-semibold text-break">
                             {{ $customer->nama }}
                         </div>
 
@@ -74,7 +75,7 @@
                             No HP
                         </div>
 
-                        <div class="col-sm-8">
+                        <div class="col-sm-8 text-break">
                             {{ $customer->no_hp ?? '-' }}
                         </div>
 
@@ -87,7 +88,7 @@
                             Alamat
                         </div>
 
-                        <div class="col-sm-8">
+                        <div class="col-sm-8 text-break">
                             {{ $customer->alamat ?? '-' }}
                         </div>
 
@@ -128,26 +129,12 @@
 
                                 <div class="mt-3">
 
-                                     @if ($payment && $payment->status === 'lunas')
-
-                                       <span class="badge bg-success px-3 py-2">
-                                           ✓ Lunas
-                                        </span>
-
-                                        @if ($payment->tanggal_bayar)
-                                             <div class="small text-muted mt-2">
-                                                 Dibayar pada:
-                                                 {{ $payment->tanggal_bayar->format('d-m-Y') }}
-                                             </div>
-                                          @endif
-
-                                      @else
-
-                                         <span class="badge bg-danger px-3 py-2">
-                                            ✕ Belum Lunas
-                                         </span>
-
-                                      @endif
+                                    <x-ui.payment-status :status="$payment?->status" />
+                                    @if ($payment?->status === 'lunas' && $payment->tanggal_bayar)
+                                        <div class="small text-muted mt-2">
+                                            Dibayar pada: {{ $payment->tanggal_bayar->format('d-m-Y') }}
+                                        </div>
+                                    @endif
 
                                 </div>
                                 @if ($customer->package->deskripsi)
@@ -176,10 +163,10 @@
 
 
             {{-- TOMBOL --}}
-            <div class="border-top mt-4 pt-4">
+            <x-ui.form-actions class="border-top mt-4 pt-4">
 
                 <a href="{{ route('customers.edit', $customer) }}"
-                   class="btn btn-warning me-2">
+                   class="btn btn-outline-secondary">
 
                     ✏️ Edit Data
 
@@ -203,7 +190,7 @@
 
                 </form>
 
-            </div>
+            </x-ui.form-actions>
 
         </div>
 

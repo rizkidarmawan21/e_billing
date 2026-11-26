@@ -6,10 +6,10 @@
 
 <div class="card border-0 shadow-sm">
 
-    <div class="card-body p-4">
+    <div class="card-body p-3 p-md-4">
 
         {{-- HEADER --}}
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <x-ui.page-header>
 
             <div>
                 <h5 class="fw-semibold mb-1">
@@ -21,6 +21,7 @@
                 </p>
             </div>
 
+            <x-slot:actions>
             <a href="{{ route('owner.admin.create') }}"
                class="btn btn-primary">
 
@@ -28,18 +29,18 @@
 
             </a>
 
-        </div>
-
+            </x-slot:actions>
+        </x-ui.page-header>
 
         {{-- TABLE --}}
-        <div class="table-responsive">
+        <div class="table-responsive" tabindex="0" role="region" aria-label="Daftar akses admin">
 
-            <table class="table table-hover align-middle mb-0">
+            <x-ui.table>
 
                 <thead class="table-light">
 
                     <tr>
-                        <th>No</th>
+                        <th class="text-center" scope="col">No.</th>
                         <th>Nama</th>
                         <th>Email</th>
                         <th>Role</th>
@@ -54,33 +55,27 @@
 
                         <tr>
 
-                            <td>
+                            <td data-label="No.">
                                 {{ $admins->firstItem() + $loop->index }}
                             </td>
 
-                            <td class="fw-semibold">
+                            <td class="fw-semibold" data-label="Nama">
                                 {{ $admin->name }}
                             </td>
 
-                            <td>
+                            <td data-label="Email">
                                 {{ $admin->email }}
                             </td>
 
-                            <td>
-                                <span class="badge bg-primary">
-                                    Admin
-                                </span>
+                            <td data-label="Role">
+                                Admin
                             </td>
 
-                            <td class="text-center">
+                            <td class="text-center" data-label="Aksi">
 
-    <div class="d-flex justify-content-center gap-2">
+    <div class="record-actions d-flex flex-wrap justify-content-center gap-2">
 
-        <a href="{{ route('owner.admin.edit', $admin->id) }}"
-           class="btn btn-sm btn-outline-secondary">
-            <i class="bi bi-pencil-square me-1"></i>
-            Edit
-        </a>
+        <x-ui.row-action action="edit" :href="route('owner.admin.edit', $admin->id)" />
 
         <form action="{{ route('owner.admin.destroy', $admin->id) }}"
               method="POST"
@@ -89,11 +84,7 @@
             @csrf
             @method('DELETE')
 
-            <button type="submit"
-                    class="btn btn-sm btn-outline-danger">
-                <i class="bi bi-trash me-1"></i>
-                Hapus
-            </button>
+            <x-ui.row-action action="delete" />
 
         </form>
 
@@ -120,7 +111,7 @@
 
                 </tbody>
 
-            </table>
+            </x-ui.table>
 
         </div>
 

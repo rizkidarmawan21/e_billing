@@ -2,19 +2,8 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between align-items-start mb-4">
-
-<div>
-    <h2 class="fw-bold mb-1">
-        Dashboard Owner
-    </h2>
-
-    <p class="text-muted mb-0">
-        Ringkasan informasi sistem e-Billing
-    </p>
-</div>
-
-
+<x-ui.page-header title="Dashboard Owner" description="Ringkasan informasi sistem e-Billing">
+<x-slot:actions>
 {{-- FILTER BULAN --}}
 <div class="dropdown">
 
@@ -39,8 +28,7 @@
 
 
     <div
-        class="dropdown-menu dropdown-menu-end p-3 shadow"
-        style="width: 360px;"
+        class="dropdown-menu dropdown-menu-end filter-menu p-3 shadow"
     >
 
         <form
@@ -120,26 +108,25 @@
 
                 <hr>
 
+            </div>
 
-                <div class="d-flex justify-content-end gap-2">
+            <x-ui.form-actions class="justify-content-end">
 
                     <a
                         href="{{ route('owner.dashboard') }}"
-                        class="btn btn-sm btn-light"
+                        class="btn btn-light"
                     >
                         Reset
                     </a>
 
                     <button
                         type="submit"
-                        class="btn btn-sm btn-primary"
+                        class="btn btn-primary"
                     >
                         Terapkan
                     </button>
 
-                </div>
-
-            </div>
+            </x-ui.form-actions>
 
         </form>
 
@@ -147,7 +134,8 @@
 
 </div>
 
-</div>
+</x-slot:actions>
+</x-ui.page-header>
 
 {{-- ========================================== --}}
 {{-- CARD STATISTIK --}}
@@ -156,7 +144,7 @@
 <div class="row g-3 mb-4">
 
     {{-- TOTAL USER --}}
-    <div class="col">
+    <div class="col-12 col-sm-6 col-xl-4">
 
         <div class="card border-0 shadow-sm h-100">
 
@@ -193,7 +181,7 @@
 
 
     {{-- TOTAL TAGIHAN --}}
-    <div class="col">
+    <div class="col-12 col-sm-6 col-xl-4">
 
         <div class="card border-0 shadow-sm h-100">
 
@@ -214,7 +202,7 @@
                             Total Tagihan
                         </p>
 
-                        <h5 class="fw-bold mb-0">
+                        <h5 class="fw-bold mb-0 text-break">
                             Rp {{ number_format($totalTagihan, 0, ',', '.') }}
                         </h5>
 
@@ -230,7 +218,7 @@
 
 
     {{-- PENDAPATAN --}}
-    <div class="col">
+    <div class="col-12 col-sm-6 col-xl-4">
 
         <div class="card border-0 shadow-sm h-100">
 
@@ -251,7 +239,7 @@
                             Pendapatan
                         </p>
 
-                        <h5 class="fw-bold mb-0">
+                        <h5 class="fw-bold mb-0 text-break">
                             Rp {{ number_format($pendapatan, 0, ',', '.') }}
                         </h5>
 
@@ -267,7 +255,7 @@
 
 
     {{-- SUDAH BAYAR --}}
-    <div class="col">
+    <div class="col-12 col-sm-6 col-xl-4">
 
         <div class="card border-0 shadow-sm h-100">
 
@@ -304,7 +292,7 @@
 
 
     {{-- BELUM BAYAR --}}
-    <div class="col">
+    <div class="col-12 col-sm-6 col-xl-4">
 
         <div class="card border-0 shadow-sm h-100">
 
@@ -342,7 +330,7 @@
 </div>
 
 {{-- TOMBOL ALL --}}
-<div class="d-flex justify-content-center mb-4">
+<x-ui.form-actions class="justify-content-center mb-4">
 
     @if($showAll)
 
@@ -360,8 +348,7 @@
 
     @endif
 
-</div>
-
+</x-ui.form-actions>
 
 {{-- GRAFIK PENDAPATAN & TAGIHAN --}}
 <div class="row g-4 mb-4">
@@ -369,7 +356,7 @@
     {{-- PENDAPATAN PER BULAN --}}
     <div class="col-lg-6">
         <div class="card border-0 shadow-sm h-100">
-            <div class="card-body p-4">
+            <div class="card-body p-3 p-sm-4">
 
                 <h5 class="fw-bold mb-1">
                     Pendapatan per Bulan
@@ -379,9 +366,20 @@
                     Grafik pendapatan berdasarkan bulan
                 </p>
 
-                <div style="height: 300px;">
+                <p id="pendapatanChartSummary" class="visually-hidden">
+                    Pendapatan per bulan tahun {{ $tahun }}:
+                    @foreach(array_values($namaBulan) as $nama)
+                        {{ $nama }}: Rp {{ number_format($pendapatanPerBulan[$loop->index], 0, ',', '.') }}{{ $loop->last ? '.' : ';' }}
+                    @endforeach
+                </p>
+                @if(array_sum($pendapatanPerBulan) == 0)
+                    <x-ui.empty-state title="Belum ada pendapatan pada periode ini" description="Ubah filter bulan untuk melihat periode lain." />
+                @endif
+
+                <div class="dashboard-chart">
                     <canvas
                         id="pendapatanChart"
+                        role="img" aria-label="Pendapatan per bulan" aria-describedby="pendapatanChartSummary"
                         data-values='@json($pendapatanPerBulan)'>
                     </canvas>
                 </div>
@@ -393,7 +391,7 @@
     {{-- TUNGGAKAN CUSTOMER --}}
     <div class="col-lg-6">
         <div class="card border-0 shadow-sm h-100">
-            <div class="card-body p-4">
+            <div class="card-body p-3 p-sm-4">
 
                 <h5 class="fw-bold mb-1">
                     Tunggakan Customer per Bulan
@@ -404,9 +402,20 @@
                     tahun {{ $tahun }}
                 </p>
 
-                <div style="height: 300px;">
+                <p id="tunggakanChartSummary" class="visually-hidden">
+                    Tunggakan customer tahun {{ $tahun }}:
+                    @foreach(array_values($namaBulan) as $nama)
+                        {{ $nama }}: {{ $tunggakanPerBulan[$loop->index] }} customer{{ $loop->last ? '.' : ';' }}
+                    @endforeach
+                </p>
+                @if(array_sum($tunggakanPerBulan) === 0)
+                    <p class="text-muted small">Tidak ada tunggakan customer pada periode yang ditampilkan.</p>
+                @endif
+
+                <div class="dashboard-chart">
                     <canvas 
                     id="tunggakanCustomerChart"
+                    role="img" aria-label="Tunggakan customer per bulan" aria-describedby="tunggakanChartSummary"
                     data-values='@json($tunggakanPerBulan)'>
                 </canvas>
                 </div>
@@ -426,7 +435,7 @@
 
         <div class="card border-0 shadow-sm h-100">
 
-            <div class="card-body p-4">
+            <div class="card-body p-3 p-sm-4">
 
                 <h5 class="fw-bold mb-1">
                     Status Pembayaran
@@ -436,9 +445,17 @@
                     Perbandingan pembayaran yang sudah dan belum dilakukan.
                 </p>
 
-                <div style="height: 300px;">
+                <p id="pembayaranChartSummary" class="visually-hidden">
+                    Sudah bayar: {{ $sudahBayar }}. Belum bayar: {{ $belumBayar }}.
+                </p>
+                @if(array_sum($statusPembayaran) === 0)
+                    <x-ui.empty-state title="Belum ada data pembayaran" description="Ubah filter bulan untuk melihat periode lain." />
+                @endif
+
+                <div class="dashboard-chart">
                     <canvas
                         id="pembayaranChart"
+                        role="img" aria-label="Status pembayaran" aria-describedby="pembayaranChartSummary"
                         data-values='@json($statusPembayaran)'>
                     </canvas>
                 </div>
@@ -455,7 +472,7 @@
 
         <div class="card border-0 shadow-sm h-100">
 
-            <div class="card-body p-4">
+            <div class="card-body p-3 p-sm-4">
 
                 <h5 class="fw-bold mb-1">
                     Distribusi Paket Pelanggan
@@ -465,9 +482,20 @@
                     Jumlah pelanggan berdasarkan paket Wi-Fi yang digunakan.
                 </p>
 
-                <div style="height: 300px;">
+                <p id="paketChartSummary" class="visually-hidden">
+                    Distribusi paket pelanggan:
+                    @foreach($distribusiPaket as $paket)
+                        {{ $paket['nama'] }}: {{ $paket['jumlah'] }} pelanggan{{ $loop->last ? '.' : ';' }}
+                    @endforeach
+                </p>
+                @if(array_sum(array_column($distribusiPaket, 'jumlah')) === 0)
+                    <x-ui.empty-state title="Belum ada pelanggan pada paket" description="Distribusi ditampilkan setelah pelanggan terhubung ke paket Wi-Fi." />
+                @endif
+
+                <div class="dashboard-chart">
                     <canvas
                         id="paketChart"
+                        role="img" aria-label="Distribusi paket pelanggan" aria-describedby="paketChartSummary"
                         data-values='@json($distribusiPaket)'>
                     </canvas>
                 </div>
@@ -480,6 +508,44 @@
 
 </div>
 
+
+<section id="tagihan-belum-dibuat" class="card border-0 shadow-sm mb-4" aria-labelledby="missing-bills-heading">
+    <div class="card-body p-3 p-sm-4">
+        <h2 id="missing-bills-heading" class="h5 fw-bold mb-1">Tagihan Belum Dibuat</h2>
+        <p class="small text-muted mb-3">Periode berjalan: {{ $currentMonth }} {{ $tahun }}</p>
+
+        @if($customersWithoutBills->total() === 0)
+            <p class="mb-0">{{ array_sum(array_column($distribusiPaket, 'jumlah')) > 0
+                ? 'Semua pelanggan yang punya paket sudah ditagih bulan ini.'
+                : 'Belum ada pelanggan yang memiliki paket.' }}</p>
+        @else
+            <p class="mb-3"><strong>{{ $customersWithoutBills->total() }} pelanggan</strong> belum punya tagihan bulan ini.</p>
+            @if($customersWithoutBills->isNotEmpty())
+                <div class="row g-0 d-none d-sm-flex border-bottom pb-2 fw-semibold" aria-hidden="true">
+                    <span class="col-sm-7">Pelanggan</span>
+                    <span class="col-sm-5">Paket</span>
+                </div>
+                <ul class="list-unstyled mb-0" aria-label="Pelanggan tanpa tagihan bulan ini">
+                    @foreach($customersWithoutBills as $customer)
+                        <li class="row g-0 border-bottom py-2">
+                            <div class="col-sm-7 pe-sm-3 text-break">
+                                <a class="btn btn-link fw-semibold text-start text-break p-0 d-inline-flex align-items-center" href="{{ route('customers.show', $customer) }}">{{ $customer->nama }}</a>
+                            </div>
+                            <div class="col-sm-5 align-self-center small text-muted text-break">
+                                <span class="visually-hidden">Paket: </span>{{ $customer->package?->nama_paket ?? 'Paket tidak tersedia' }}
+                            </div>
+                        </li>
+                    @endforeach
+                </ul>
+            @else
+                <p class="mb-0">Tidak ada pelanggan di halaman ini. <a href="{{ $customersWithoutBills->url(1) }}">Kembali ke halaman pertama</a>.</p>
+            @endif
+            @if($customersWithoutBills->hasPages())
+                <div class="payment-pagination mt-3">{{ $customersWithoutBills->links('pagination::bootstrap-5') }}</div>
+            @endif
+        @endif
+    </div>
+</section>
 
 {{-- ========================================== --}}
 {{-- SCRIPT FILTER --}}
@@ -508,52 +574,6 @@ function toggleBulan() {
 
 }
 
-</script>
-
-
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const canvas = document.getElementById('tunggakanCustomerChart');
-
-    if (!canvas) {
-        console.error('Canvas tunggakan tidak ditemukan');
-        return;
-    }
-
-    if (typeof Chart === 'undefined') {
-        console.error('Chart.js belum dimuat');
-        return;
-    }
-
-    new Chart(canvas, {
-        type: 'bar',
-        data: {
-            labels: @json(array_values($namaBulan)),
-            datasets: [{
-                label: 'Tunggakan Customer',
-                data: @json($tunggakanPerBulan),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
-        }
-    });
-});
 </script>
 
 

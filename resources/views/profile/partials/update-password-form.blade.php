@@ -19,13 +19,12 @@
                 Password Saat Ini
             </label>
 
-            <input
+            <x-ui.password-input
                 id="current_password"
                 name="current_password"
-                type="password"
                 class="form-control"
                 autocomplete="current-password"
-            >
+            />
 
             @if ($errors->updatePassword->get('current_password'))
                 <div class="text-danger small mt-1">
@@ -40,13 +39,12 @@
                 Password Baru
             </label>
 
-            <input
+            <x-ui.password-input
                 id="password"
                 name="password"
-                type="password"
                 class="form-control"
                 autocomplete="new-password"
-            >
+            />
 
             @if ($errors->updatePassword->get('password'))
                 <div class="text-danger small mt-1">
@@ -61,13 +59,12 @@
                 Konfirmasi Password Baru
             </label>
 
-            <input
+            <x-ui.password-input
                 id="password_confirmation"
                 name="password_confirmation"
-                type="password"
                 class="form-control"
                 autocomplete="new-password"
-            >
+            />
 
             @if ($errors->updatePassword->get('password_confirmation'))
                 <div class="text-danger small mt-1">
@@ -77,13 +74,13 @@
         </div>
 
         {{-- BUTTON --}}
-        <div class="mt-4">
+        <x-ui.form-actions class="mt-4">
             <button type="submit"
                     class="btn text-white px-4"
                     style="background-color: #2563a6;">
                 Simpan Password
             </button>
-        </div>
+        </x-ui.form-actions>
 
         @if (session('status') === 'password-updated')
             <div class="alert alert-success mt-3 mb-0">

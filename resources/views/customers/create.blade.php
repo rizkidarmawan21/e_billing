@@ -5,7 +5,7 @@
 <div class="container-fluid">
 
     {{-- HEADER --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <x-ui.page-header>
 
         <div>
             <h4 class="fw-bold mb-1">
@@ -17,15 +17,16 @@
             </p>
         </div>
 
+        <x-slot:actions>
         <a href="{{ route('customers.index') }}"
-           class="btn btn-secondary">
+           class="btn btn-outline-secondary">
 
             ← Kembali
 
         </a>
 
-    </div>
-
+        </x-slot:actions>
+    </x-ui.page-header>
 
     {{-- FORM --}}
     <div class="card border-0 shadow-sm">
@@ -39,7 +40,7 @@
         </div>
 
 
-        <div class="card-body p-4">
+        <div class="card-body p-3 p-md-4">
 
             {{-- ERROR VALIDASI --}}
             @if ($errors->any())
@@ -70,15 +71,7 @@
 
 
               {{-- KODE PELANGGAN --}}
-<div class="mb-3">
-
-    <label for="kode_pelanggan"
-           class="form-label fw-semibold">
-
-        Kode Pelanggan
-
-    </label>
-
+<x-ui.field name="kode_pelanggan" label="Kode Pelanggan" :required="true">
     <input
         type="text"
         id="kode_pelanggan"
@@ -89,19 +82,10 @@
         required
     >
 
-</div>
-
+</x-ui.field>
 
                 {{-- NAMA --}}
-                <div class="mb-3">
-
-                    <label for="nama"
-                           class="form-label fw-semibold">
-
-                        Nama Customer
-
-                    </label>
-
+                <x-ui.field name="nama" label="Nama Customer" :required="true">
                     <input
                         type="text"
                         id="nama"
@@ -112,19 +96,10 @@
                         required
                     >
 
-                </div>
-
+                </x-ui.field>
 
                 {{-- NOMOR HP --}}
-                <div class="mb-3">
-
-                    <label for="no_hp"
-                           class="form-label fw-semibold">
-
-                        Nomor HP
-
-                    </label>
-
+                <x-ui.field name="no_hp" label="Nomor HP">
                     <input
                         type="text"
                         id="no_hp"
@@ -134,19 +109,10 @@
                         value="{{ old('no_hp') }}"
                     >
 
-                </div>
-
+                </x-ui.field>
 
                 {{-- ALAMAT --}}
-                <div class="mb-3">
-
-                    <label for="alamat"
-                           class="form-label fw-semibold">
-
-                        Alamat
-
-                    </label>
-
+                <x-ui.field name="alamat" label="Alamat">
                     <textarea
                         id="alamat"
                         name="alamat"
@@ -155,8 +121,7 @@
                         placeholder="Masukkan alamat customer"
                     >{{ old('alamat') }}</textarea>
 
-                </div>
-
+                </x-ui.field>
 
                 {{-- PAKET --}}
                 <div class="mb-4">
@@ -207,7 +172,7 @@
 
 
                 {{-- TOMBOL --}}
-                <div class="d-flex gap-2">
+                <x-ui.form-actions>
 
                     <button
                         type="submit"
@@ -221,14 +186,14 @@
 
                     <a
                         href="{{ route('customers.index') }}"
-                        class="btn btn-secondary"
+                        class="btn btn-outline-secondary"
                     >
 
                         Batal
 
                     </a>
 
-                </div>
+                </x-ui.form-actions>
 
             </form>
 

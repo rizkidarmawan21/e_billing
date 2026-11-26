@@ -6,6 +6,7 @@ use App\Models\Payment;
 use App\Models\Customer;
 use App\Models\Package;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 
@@ -127,6 +128,20 @@ public function index(Request $request)
     ));
 }
 
+    public function paid(Request $request)
+    {
+        $filters = $request->validate(['search' => ['nullable', 'string', 'max:255']]);
+        $payments = Payment::query()->with('customer')
+            ->where('status', 'lunas')
+            ->when(filled($filters['search'] ?? null), fn ($query) => $query->whereHas(
+                'customer', fn ($customer) => $customer->where('nama', 'like', '%'.$filters['search'].'%')
+            ))
+            ->orderByDesc('tanggal_bayar')->orderByDesc('id')
+            ->paginate(10)->appends($filters);
+
+        return view('payments.paid', compact('payments', 'filters'));
+    }
+
     /**
      * Form tambah tagihan.
      */
@@ -246,7 +261,7 @@ if ($request->status === 'lunas') {
     /**
      * Menampilkan detail tagihan.
      */
-    public function show(Payment $payment)
+    public function show(Request $request, Payment $payment)
 {
     $payment->load(['customer', 'package']);
 
@@ -261,24 +276,30 @@ if ($request->status === 'lunas') {
         }
     ]);
 
+    $returnUrl = $this->paymentListUrl($request->query(), $request->query());
+
     return view('payments.show', compact(
         'payment',
-        'customer'
+        'customer',
+        'returnUrl'
     ));
 }
 
     /**
      * Form edit tagihan.
      */
-    public function edit(Payment $payment)
+    public function edit(Request $request, Payment $payment)
     {
         $customers = Customer::orderBy('nama')->get();
         $packages = Package::orderBy('harga')->get();
 
+        $returnUrl = $this->paymentListUrl($request->query(), $request->query());
+
         return view('payments.edit', compact(
             'payment',
             'customers',
-            'packages'
+            'packages',
+            'returnUrl'
         ));
     }
 
@@ -294,7 +315,7 @@ if ($request->status === 'lunas') {
             'search' => ['nullable', 'string', 'max:255'],
             'page' => ['nullable', 'integer', 'min:1'],
         ])->validate();
-        $returnUrl = in_array($request->user()->role, ['owner', 'admin'], true) && $request->query('from_unpaid') === '1' ? route('payments.unpaid', $returnFilters) : route('payments.index');
+        $returnUrl = $this->paymentListUrl($request->query(), $returnFilters);
 
 if ($request->status === 'lunas') {
     $request->merge([
@@ -346,7 +367,16 @@ if ($request->status === 'lunas') {
         ])->validate();
         $payment->delete();
 
-        return redirect(in_array($request->user()->role, ['owner', 'admin'], true) && $request->input('from_unpaid') === '1' ? route('payments.unpaid', $filters) : route('payments.index'))
+        return redirect($this->paymentListUrl($request->all(), $filters))
             ->with('success', 'Tagihan berhasil dihapus.');
+    }
+
+    private function paymentListUrl(array $context, array $filters): string
+    {
+        return match (true) {
+            ($context['from_unpaid'] ?? null) === '1' => route('payments.unpaid', Arr::except($filters, ['from_unpaid', 'from_paid'])),
+            ($context['from_paid'] ?? null) === '1' => route('payments.paid', Arr::only($filters, ['search', 'page'])),
+            default => route('payments.index'),
+        };
     }
 }

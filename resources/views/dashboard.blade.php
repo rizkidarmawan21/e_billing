@@ -5,15 +5,7 @@
 <div class="container-fluid">
 
     {{-- HEADER --}}
-    <div class="mb-4">
-        <h3 class="fw-bold mb-1">
-            Dashboard
-        </h3>
-
-        <p class="text-muted mb-0">
-            Ringkasan data E-Billing
-        </p>
-    </div>
+    <x-ui.page-header title="Dashboard" description="Ringkasan data E-Billing" />
 
 
     {{-- ========================= --}}
@@ -31,11 +23,12 @@
                     {{-- TAHUN --}}
                     <div class="col-md-4">
 
-                        <label class="form-label fw-semibold">
+                        <label for="dashboardTahun" class="form-label fw-semibold">
                             Tahun
                         </label>
 
                         <select name="tahun"
+                                id="dashboardTahun"
                                 class="form-select"
                                 onchange="this.form.submit()">
 
@@ -79,6 +72,7 @@
 
                         <select name="bulan"
                                 id="selectBulan"
+                                aria-label="Bulan tagihan"
                                 class="form-select"
                                 {{ $bulan ? '' : 'disabled' }}
                                 onchange="this.form.submit()">
@@ -118,7 +112,7 @@
     <div class="row g-4 mb-4">
 
         {{-- TOTAL USER --}}
-        <div class="col-md-6 col-xl-3">
+        <div class="col-12 col-sm-6 col-xl-3">
 
             <div class="card border-0 shadow-sm h-100">
 
@@ -144,7 +138,7 @@
 
 
         {{-- TOTAL TAGIHAN --}}
-        <div class="col-md-6 col-xl-3">
+        <div class="col-12 col-sm-6 col-xl-3">
 
             <div class="card border-0 shadow-sm h-100">
 
@@ -154,7 +148,7 @@
                         Total Tagihan
                     </p>
 
-                    <h2 class="fw-bold mb-0">
+                    <h2 class="fw-bold mb-0 text-break">
 
                         Rp {{ number_format($totalTagihan, 0, ',', '.') }}
 
@@ -172,7 +166,7 @@
 
 
         {{-- SUDAH BAYAR --}}
-        <div class="col-md-6 col-xl-3">
+        <div class="col-12 col-sm-6 col-xl-3">
 
             <div class="card border-0 shadow-sm h-100">
 
@@ -198,7 +192,7 @@
 
 
         {{-- BELUM BAYAR --}}
-        <div class="col-md-6 col-xl-3">
+        <div class="col-12 col-sm-6 col-xl-3">
 
             <div class="card border-0 shadow-sm h-100">
 
@@ -228,7 +222,7 @@
 {{-- TOMBOL ALL --}}
 {{-- ========================= --}}
 
-<div class="d-flex justify-content-center gap-2 mb-4">
+<x-ui.form-actions class="justify-content-center mb-4">
 
     {{-- TOMBOL ALL --}}
     <a href="{{ route('dashboard', ['tahun' => $tahun, 'all' => 1]) }}"
@@ -238,11 +232,11 @@
 
     {{-- KEMBALI KE BULAN SEKARANG --}}
     <a href="{{ route('dashboard', ['tahun' => now()->year]) }}"
-       class="btn btn-secondary px-4">
+       class="btn btn-outline-secondary px-4">
         Bulan Sekarang
     </a>
 
-</div>
+</x-ui.form-actions>
 
     {{-- ========================= --}}
     {{-- DIAGRAM --}}
@@ -276,9 +270,16 @@
                     </div>
 
 
-                    <div style="height: 320px;">
+                    <p id="paymentChartSummary" class="visually-hidden">
+                        Sudah bayar: {{ $sudahBayar }}. Belum bayar: {{ $belumBayar }}.
+                    </p>
+                    @if($sudahBayar + $belumBayar === 0)
+                        <x-ui.empty-state title="Belum ada data pembayaran" description="Pilih periode lain untuk melihat status pembayaran." />
+                    @endif
 
-                        <canvas id="paymentChart"></canvas>
+                    <div class="dashboard-chart">
+
+                        <canvas id="paymentChart" role="img" aria-label="Status pembayaran" aria-describedby="paymentChartSummary"></canvas>
 
                     </div>
 
@@ -309,9 +310,19 @@
                     </div>
 
 
-                    <div style="height: 320px;">
+                    <p id="userChartSummary" class="visually-hidden">
+                        Tunggakan customer tahun {{ $tahun }}:
+                        @foreach($diagramLabels as $label)
+                            {{ $label }}: {{ $diagramData[$loop->index] }} customer{{ $loop->last ? '.' : ';' }}
+                        @endforeach
+                    </p>
+                    @if(array_sum($diagramData) === 0)
+                        <p class="text-muted small">Tidak ada tunggakan customer pada periode yang ditampilkan.</p>
+                    @endif
 
-                        <canvas id="userChart"></canvas>
+                    <div class="dashboard-chart">
+
+                        <canvas id="userChart" role="img" aria-label="Tunggakan customer per bulan" aria-describedby="userChartSummary"></canvas>
 
                     </div>
 

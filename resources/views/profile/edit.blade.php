@@ -7,7 +7,7 @@
 <div class="container-fluid">
 
     {{-- HEADER HALAMAN --}}
-    <div class="mb-4">
+    <x-ui.page-header>
         <h4 class="fw-bold mb-1">
             {{ Auth::user()->role === 'owner' ? 'Profile Owner' : 'Profile Admin' }}
         </h4>
@@ -17,8 +17,7 @@
                 ? 'Kelola informasi akun owner.'
                 : 'Kelola informasi akun administrator.' }}
         </p>
-    </div>
-
+    </x-ui.page-header>
 
     {{-- INFORMASI PROFILE --}}
     <div class="card border-0 shadow-sm mb-4">
@@ -29,7 +28,7 @@
             </h5>
         </div>
 
-        <div class="card-body p-4">
+        <div class="card-body p-3 p-md-4">
 
             @include('profile.partials.update-profile-information-form')
 
@@ -47,7 +46,7 @@
             </h5>
         </div>
 
-        <div class="card-body p-4">
+        <div class="card-body p-3 p-md-4">
 
             @include('profile.partials.update-password-form')
 
@@ -65,7 +64,7 @@
             </h5>
         </div>
 
-        <div class="card-body p-4">
+        <div class="card-body p-3 p-md-4">
 
             @include('profile.partials.delete-user-form')
 

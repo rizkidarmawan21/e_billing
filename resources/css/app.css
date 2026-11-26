@@ -30,3 +30,144 @@
     max-width: 14px !important;
     max-height: 14px !important;
 }
+
+[x-cloak] { display: none !important; }
+
+.billing-app {
+    --bs-primary: #2563a6;
+    --bs-primary-rgb: 37, 99, 166;
+    --bs-link-color: #2563a6;
+    --bs-link-hover-color: #1c4b7e;
+    color: #212529;
+    font-variant-numeric: tabular-nums;
+}
+
+.billing-app .btn-primary {
+    --bs-btn-bg: #2563a6;
+    --bs-btn-border-color: #2563a6;
+    --bs-btn-hover-bg: #1c4b7e;
+    --bs-btn-hover-border-color: #1c4b7e;
+    --bs-btn-active-bg: #183f6a;
+    --bs-btn-active-border-color: #183f6a;
+}
+
+.billing-app .btn-outline-primary {
+    --bs-btn-color: #2563a6;
+    --bs-btn-border-color: #2563a6;
+    --bs-btn-hover-bg: #2563a6;
+    --bs-btn-hover-border-color: #2563a6;
+    --bs-btn-active-bg: #1c4b7e;
+    --bs-btn-active-border-color: #1c4b7e;
+}
+
+.panel-shell { min-height: 100dvh; }
+.panel-sidebar { --bs-offcanvas-width: min(18rem, 90vw); }
+.billing-app .panel-sidebar { background-color: #2563a6 !important; }
+.panel-sidebar .offcanvas-body { min-height: 0; }
+.panel-brand { padding: 1.5rem; }
+.panel-logo { object-fit: contain; }
+.panel-workspace { min-width: 0; width: 100%; }
+.panel-header { display: flex; align-items: center; gap: .75rem; padding: .75rem 1rem; }
+.panel-title { min-width: 0; overflow-wrap: anywhere; font-size: 1rem; }
+.panel-account { padding: .25rem; }
+.panel-avatar { display: inline-flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; border-radius: 50%; flex-shrink: 0; }
+.panel-account-name { max-width: 12rem; }
+.panel-account-menu { width: min(19rem, calc(100vw - 2rem)); overflow-wrap: anywhere; }
+.billing-app .dropdown-item { min-height: 44px; display: flex; align-items: center; white-space: normal; }
+.panel-content { min-width: 0; padding: 1rem; }
+.panel-content > .container-fluid { padding-left: 0; padding-right: 0; }
+.panel-content :is(.card, .card-body, .row > *, .page-toolbar-copy) { min-width: 0; }
+.panel-content :is(h2, h3, h4, h5, p, dd, strong, .badge) { overflow-wrap: anywhere; }
+.panel-content .badge { white-space: normal; }
+.panel-content :is(input, select, textarea) { max-width: 100%; }
+.billing-app .panel-nav-link { color: white; display: flex; align-items: center; gap: .75rem; padding: .75rem 1rem; min-height: 48px; }
+.panel-nav-link i { width: 1.25rem; text-align: center; flex-shrink: 0; }
+.billing-app .panel-nav-link:is(:hover, :focus-visible, .active) { color: white; background-color: #194a7e; }
+.panel-nav-link.active { font-weight: 600; }
+:is(.billing-app, .billing-auth) :is(a, button, input, select, textarea):focus-visible {
+    outline: 2px solid var(--bs-primary);
+    outline-offset: 2px;
+}
+:is(.billing-app, .billing-auth) :is(.form-control, .form-select):focus-visible {
+    box-shadow: none;
+}
+:is(.billing-app, .billing-auth) :is(.form-control, .form-select):is(.is-invalid, [aria-invalid="true"]):focus-visible {
+    outline-color: var(--bs-form-invalid-border-color);
+}
+.billing-app .panel-sidebar :is(a, button):focus-visible { outline-color: white; }
+.skip-link { position: absolute; z-index: 1060; background: white; padding: .75rem; }
+.page-toolbar { display: flex; flex-direction: column; gap: 1rem; }
+.page-toolbar-copy { min-width: 0; }
+.page-toolbar-actions, .form-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.form-actions { margin-top: 1rem; }
+.customer-search-actions > .btn { display: inline-flex; align-items: center; justify-content: center; }
+.page-toolbar-actions > *, .form-actions > * { min-width: 0; }
+.billing-app :is(.btn, .page-link), .billing-auth .btn, .password-toggle { min-height: 44px; }
+.billing-app :is(.btn, .page-link), .password-toggle { min-width: 44px; }
+.billing-app .page-link { display: flex; align-items: center; justify-content: center; }
+.billing-app .form-check { display: flex; align-items: center; gap: .5rem; padding-left: 0; min-height: 44px; }
+.billing-app .form-check .form-check-input { float: none; flex-shrink: 0; margin: 0; }
+.billing-app .form-check-label { padding: .6rem 0; cursor: pointer; }
+.billing-app .filter-menu { width: min(22.5rem, calc(100vw - 2rem)); max-height: min(36rem, 75dvh); overflow-y: auto; }
+.dashboard-chart { position: relative; min-width: 0; height: clamp(14rem, 40vw, 20rem); }
+.record-actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; justify-content: center; }
+.record-actions > .btn, .record-actions > form > .btn { display: inline-flex; align-items: center; justify-content: center; margin: 0 !important; }
+.record-actions .record-action { width: 44px; height: 44px; padding: 0; font-size: 1rem; }
+.billing-table :is(th, td):has(.record-actions) { text-align: center; }
+.billing-table td[data-label="Aksi"] .record-actions { min-width: max-content; }
+.billing-table td:is([data-label="Nominal"], [data-label="Tagihan"], [data-label="Harga"]) { text-align: right; white-space: nowrap; }
+.billing-table td:is([data-label="No"], [data-label="No."]) { text-align: center; white-space: nowrap; }
+.billing-table td[data-label="Paket"] { min-width: 9rem; overflow-wrap: normal; }
+.billing-table .package-name { display: inline-block; max-width: 14rem; overflow-wrap: break-word; }
+.panel-content .billing-table .badge { white-space: nowrap; overflow-wrap: normal; }
+.panel-content .payment-status { white-space: nowrap; padding: .35rem .55rem; }
+.billing-table .table-description { min-width: 14rem; }
+.billing-table .table-description > div { max-width: 32rem; overflow-wrap: break-word; }
+.billing-app .table-responsive:focus-visible { outline: 2px solid var(--bs-primary); outline-offset: -2px; }
+.password-input { flex-wrap: nowrap; }
+.password-input > .form-control { min-width: 0; }
+.billing-app .table-responsive { min-width: 0; }
+.billing-app .payment-pagination nav { gap: .75rem; flex-wrap: wrap; }
+.billing-app .payment-pagination .pagination { gap: .25rem; }
+
+@media (min-width: 576px) {
+    .page-toolbar { flex-direction: row; justify-content: space-between; align-items: flex-start; }
+    .page-toolbar-actions { justify-content: flex-end; }
+    .panel-content { padding: 1.5rem; }
+}
+
+@media (min-width: 992px) {
+    .panel-shell { display: flex; align-items: flex-start; }
+    .panel-sidebar { width: 250px; flex: 0 0 250px; position: sticky; top: 0; height: 100dvh; }
+    .panel-sidebar .offcanvas-body { height: 100%; overflow-y: auto; }
+    .panel-header { padding: 1rem 1.5rem; }
+    .panel-title { font-size: 1.25rem; }
+    .panel-account { padding: .25rem .5rem; }
+}
+
+@media (max-width: 767.98px) {
+    .billing-app .form-control, .billing-app .form-select,
+    .billing-auth .form-control, .billing-auth .form-select { font-size: 1rem; min-height: 44px; }
+    .panel-content .card-body.p-4 { padding: 1rem !important; }
+    .panel-content .card-body.p-5 { padding: 1.25rem !important; }
+    .table-scroll-hint { position: sticky; left: 0; border-bottom: 1px solid var(--bs-border-color); }
+    .billing-table { font-size: .875rem; }
+    .billing-table > :not(caption) > * > * { padding: .5rem .75rem !important; }
+    .billing-table th { white-space: nowrap; }
+    .billing-table td:is([data-label="Customer"], [data-label="Pelanggan"], [data-label="Nama"], [data-label="Nama Customer"], [data-label="Nama Paket"], [data-label="Periode"]) {
+        min-width: 8rem;
+        overflow-wrap: anywhere;
+    }
+    .billing-table td:is([data-label="Kode Customer"], [data-label="No. HP"], [data-label="Kecepatan"], [data-label="Tanggal Bayar"]) { white-space: nowrap; }
+
+    .page-toolbar-actions { width: 100%; }
+    .form-actions > .btn, .form-actions > form { flex: 1 1 auto; }
+    .form-actions > form > .btn { width: 100%; }
+    .customer-search-actions { flex-wrap: nowrap; }
+    .customer-search-actions > .btn { flex: 1 1 0; }
+    .billing-app .payment-pagination nav > .d-sm-flex { flex-wrap: wrap; gap: .75rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .billing-app .offcanvas, .billing-app .offcanvas-backdrop { transition: none; }
+}

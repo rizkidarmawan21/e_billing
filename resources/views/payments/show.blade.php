@@ -7,29 +7,16 @@
 <div class="container-fluid">
 
     {{-- HEADER --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <div>
-
-            <h4 class="fw-bold mb-1">
-                Detail Customer
-            </h4>
-
-            <p class="text-muted mb-0">
-                Informasi customer dan riwayat tagihan pembayaran.
-            </p>
-
-        </div>
-
-
-        <a href="{{ (request('from_unpaid') === '1' ? route('payments.unpaid', request()->except('from_unpaid')) : route('payments.index')) }}"
-           class="btn btn-secondary">
+    <x-ui.page-header title="Detail Customer" description="Informasi customer dan riwayat tagihan pembayaran.">
+        <x-slot:actions>
+        <a href="{{ $returnUrl }}"
+           class="btn btn-outline-secondary">
 
             ← Kembali
 
         </a>
-
-    </div>
+        </x-slot:actions>
+    </x-ui.page-header>
 
 
     <div class="row g-4">
@@ -42,7 +29,7 @@
                 <div class="card-header bg-primary text-white">
 
                     <h5 class="mb-0">
-                        👤 Informasi Customer
+                        Informasi Customer
                     </h5>
 
                 </div>
@@ -116,7 +103,7 @@
                 <div class="card-header bg-info text-white">
 
                     <h5 class="mb-0">
-                        📦 Informasi Paket
+                        Informasi Paket
                     </h5>
 
                 </div>
@@ -185,7 +172,7 @@
                 <div class="card-header bg-light">
 
                     <h5 class="fw-bold mb-1">
-                        💳 Riwayat Tagihan
+                        Riwayat Tagihan
                     </h5>
 
                     <small class="text-muted">
@@ -197,16 +184,16 @@
 
                 <div class="card-body p-0">
 
-                    <div class="table-responsive">
+                    <div class="table-responsive" tabindex="0" role="region" aria-label="Riwayat tagihan">
 
-                        <table class="table table-hover align-middle mb-0">
+                        <x-ui.table>
 
                             <thead class="table-light">
 
                                 <tr>
 
-                                    <th class="px-4 py-3">
-                                        No
+                                    <th class="px-4 py-3 text-center" scope="col">
+                                        No.
                                     </th>
 
                                     <th>
@@ -245,7 +232,7 @@
                                     <tr>
 
                                         {{-- NO --}}
-                                        <td class="px-4">
+                                        <td data-label="No." class="px-4">
 
                                             {{ $loop->iteration }}
 
@@ -253,7 +240,7 @@
 
 
                                         {{-- PERIODE --}}
-                                        <td>
+                                        <td data-label="Periode">
 
                                             <strong>
                                                 {{ $history->periode }}
@@ -264,7 +251,7 @@
 
 
                                         {{-- PAKET --}}
-                                        <td>
+                                        <td data-label="Paket">
 
                                             {{ $history->package->nama_paket ?? '-' }}
 
@@ -282,7 +269,7 @@
 
 
                                         {{-- JUMLAH --}}
-                                        <td>
+                                        <td data-label="Jumlah Tagihan">
 
                                             <strong class="text-primary">
 
@@ -300,31 +287,15 @@
 
 
                                         {{-- STATUS --}}
-                                        <td>
+                                        <td data-label="Status">
 
-                                            @if ($history->status === 'lunas')
-
-                                                <span class="badge bg-success px-3 py-2">
-
-                                                    ✓ Lunas
-
-                                                </span>
-
-                                            @else
-
-                                                <span class="badge bg-danger px-3 py-2">
-
-                                                    ✕ Belum Lunas
-
-                                                </span>
-
-                                            @endif
+                                            <x-ui.payment-status :status="$history->status" />
 
                                         </td>
 
 
                                         {{-- TANGGAL BAYAR --}}
-                                        <td>
+                                        <td data-label="Tanggal Bayar">
 
                                             @if ($history->tanggal_bayar)
 
@@ -342,24 +313,19 @@
 
 
                                         {{-- AKSI --}}
-                                       <td class="text-center">
-    <a href="{{ route('payments.edit', array_merge(['payment' => $history], request()->except('payment'))) }}"
-       class="btn btn-sm btn-warning me-1">
-        Edit
-    </a>
-
-    <form action="{{ route('payments.destroy', array_merge(['payment' => $history], request()->except('payment'))) }}"
-          method="POST"
-          class="d-inline"
-          onsubmit="return confirm('Yakin ingin menghapus riwayat pembayaran {{ $history->periode }} {{ $history->tahun }}?');">
-        @csrf
-        @method('DELETE')
-
-        <button type="submit" class="btn btn-sm btn-danger">
-            Hapus
-        </button>
-    </form>
-</td>
+                                        <td data-label="Aksi" class="text-center">
+                                            <div class="record-actions">
+                                                <x-ui.row-action action="edit" :href="route('payments.edit', array_merge(['payment' => $history], request()->except('payment')))" />
+                                                <form action="{{ route('payments.destroy', array_merge(['payment' => $history], request()->except('payment'))) }}"
+                                                      method="POST"
+                                                      class="d-inline"
+                                                      onsubmit="return confirm('Yakin ingin menghapus riwayat pembayaran {{ $history->periode }} {{ $history->tahun }}?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <x-ui.row-action action="delete" />
+                                                </form>
+                                            </div>
+                                        </td>
 
                                     </tr>
 
@@ -370,21 +336,7 @@
                                         <td colspan="7"
                                             class="text-center py-5">
 
-                                            <div class="text-muted">
-
-                                                <div class="fs-1 mb-3">
-                                                    💳
-                                                </div>
-
-                                                <h5>
-                                                    Belum ada riwayat tagihan
-                                                </h5>
-
-                                                <p class="mb-0">
-                                                    Customer belum memiliki data tagihan.
-                                                </p>
-
-                                            </div>
+                                            <x-ui.empty-state title="Belum ada riwayat tagihan" description="Customer belum memiliki data tagihan." />
 
                                         </td>
 
@@ -394,7 +346,7 @@
 
                             </tbody>
 
-                        </table>
+                        </x-ui.table>
 
                     </div>
 
@@ -408,12 +360,12 @@
         {{-- TOMBOL --}}
         <div class="col-12">
 
-            <div class="d-flex gap-2">
+            <x-ui.form-actions>
 
                 <a href="{{ route('payments.edit', array_merge(['payment' => $payment], request()->except('payment'))) }}"
-                   class="btn btn-warning">
+                   class="btn btn-outline-secondary">
 
-                    ✏️ Edit Payment
+                    Edit Payment
 
                 </a>
 
@@ -429,13 +381,13 @@
                     <button type="submit"
                             class="btn btn-danger">
 
-                        🗑️ Hapus Payment
+                        Hapus Payment
 
                     </button>
 
                 </form>
 
-            </div>
+            </x-ui.form-actions>
 
         </div>
 

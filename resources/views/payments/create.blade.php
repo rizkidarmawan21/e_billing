@@ -5,19 +5,11 @@
 <div class="container-fluid">
 
     {{-- HEADER --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="fw-bold mb-1">Tambah Payment</h4>
-            <p class="text-muted mb-0">
-                Tambahkan tagihan pembayaran customer.
-            </p>
-        </div>
-
-        <a href="{{ route('payments.index') }}"
-           class="btn btn-secondary">
-            ← Kembali
-        </a>
-    </div>
+    <x-ui.page-header title="Tambah Payment" description="Tambahkan tagihan pembayaran customer.">
+        <x-slot:actions>
+            <a href="{{ route('payments.index') }}" class="btn btn-outline-secondary">← Kembali</a>
+        </x-slot:actions>
+    </x-ui.page-header>
 
 
     {{-- FORM --}}
@@ -291,23 +283,23 @@
 
 
                 {{-- TOMBOL --}}
-                <div class="d-flex gap-2">
+                <x-ui.form-actions>
 
                     <button
                         type="submit"
                         class="btn btn-primary"
                     >
-                        💾 Simpan Payment
+                        Simpan Payment
                     </button>
 
                     <a
                         href="{{ route('payments.index') }}"
-                        class="btn btn-secondary"
+                        class="btn btn-outline-secondary"
                     >
                         Batal
                     </a>
 
-                </div>
+                </x-ui.form-actions>
 
             </form>
 

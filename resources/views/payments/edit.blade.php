@@ -5,24 +5,11 @@
 <div class="container-fluid">
 
     {{-- HEADER --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <div>
-            <h4 class="fw-bold mb-1">
-                Edit Payment
-            </h4>
-
-            <p class="text-muted mb-0">
-                Ubah data tagihan dan pembayaran customer.
-            </p>
-        </div>
-
-        <a href="{{ (request('from_unpaid') === '1' ? route('payments.unpaid', request()->except('from_unpaid')) : route('payments.index')) }}"
-           class="btn btn-secondary">
-            ← Kembali
-        </a>
-
-    </div>
+    <x-ui.page-header title="Edit Payment" description="Ubah data tagihan dan pembayaran customer.">
+        <x-slot:actions>
+            <a href="{{ $returnUrl }}" class="btn btn-outline-secondary">← Kembali</a>
+        </x-slot:actions>
+    </x-ui.page-header>
 
 
     {{-- FORM --}}
@@ -306,24 +293,24 @@
 
 
                 {{-- TOMBOL --}}
-                <div class="d-flex gap-2">
+                <x-ui.form-actions>
 
                     <button
                         type="submit"
                         class="btn btn-primary"
                     >
-                        💾 Simpan Perubahan
+                        Simpan Perubahan
                     </button>
 
 
                     <a
-                        href="{{ (request('from_unpaid') === '1' ? route('payments.unpaid', request()->except('from_unpaid')) : route('payments.index')) }}"
-                        class="btn btn-secondary"
+                        href="{{ $returnUrl }}"
+                        class="btn btn-outline-secondary"
                     >
                         Batal
                     </a>
 
-                </div>
+                </x-ui.form-actions>
 
             </form>
 

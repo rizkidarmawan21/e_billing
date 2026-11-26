@@ -13,9 +13,9 @@
     ])
 </head>
 
-<body class="bg-light">
+<body class="billing-auth bg-light">
 
-<div class="min-vh-100 d-flex align-items-center justify-content-center py-5">
+<div class="min-vh-100 d-flex align-items-center justify-content-center py-4 py-md-5">
 
     <div class="container">
 
@@ -26,7 +26,7 @@
                 {{-- CARD --}}
                 <div class="card border-0 shadow-sm">
 
-                    <div class="card-body p-4 p-md-5">
+                    <div class="card-body p-3 p-sm-4 p-md-5">
 
                         {{-- LOGO PT --}}
                         <div class="text-center mb-4">
@@ -50,7 +50,7 @@
 
 
                         {{-- JUDUL --}}
-                        <div class="mb-4">
+                        <x-ui.page-header>
 
                             <h4 class="fw-bold mb-1">
                                 Lupa Password?
@@ -60,8 +60,7 @@
                                 Masukkan email akun administrator untuk mendapatkan link reset password.
                             </p>
 
-                        </div>
-
+                        </x-ui.page-header>
 
                         {{-- STATUS BERHASIL --}}
                         @if (session('status'))
@@ -99,15 +98,7 @@
                             @csrf
 
                             {{-- EMAIL --}}
-                            <div class="mb-4">
-
-                                <label
-                                    for="email"
-                                    class="form-label fw-semibold"
-                                >
-                                    Email
-                                </label>
-
+                            <x-ui.field name="email" label="Email" :required="true" class="mb-4">
                                 <div class="input-group">
 
                                     <span class="input-group-text bg-white">
@@ -128,10 +119,10 @@
 
                                 </div>
 
-                            </div>
-
+                            </x-ui.field>
 
                             {{-- BUTTON --}}
+                            <x-ui.form-actions>
                             <button
                                 type="submit"
                                 class="btn w-100 text-white fw-semibold py-2"
@@ -139,6 +130,7 @@
                             >
                                 Kirim Link Reset Password
                             </button>
+                            </x-ui.form-actions>
 
 
                             {{-- KEMBALI LOGIN --}}

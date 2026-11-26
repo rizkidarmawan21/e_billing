@@ -14,11 +14,7 @@
         @method('patch')
 
         {{-- NAMA --}}
-        <div class="mb-3">
-            <label for="name" class="form-label fw-semibold">
-                Nama
-            </label>
-
+        <x-ui.field name="name" label="Nama" :required="true">
             <input
                 id="name"
                 name="name"
@@ -30,19 +26,10 @@
                 autocomplete="name"
             >
 
-            @if ($errors->get('name'))
-                <div class="text-danger small mt-1">
-                    {{ $errors->first('name') }}
-                </div>
-            @endif
-        </div>
+        </x-ui.field>
 
         {{-- EMAIL --}}
-        <div class="mb-3">
-            <label for="email" class="form-label fw-semibold">
-                Email
-            </label>
-
+        <x-ui.field name="email" label="Email" :required="true">
             <input
                 id="email"
                 name="email"
@@ -53,21 +40,16 @@
                 autocomplete="username"
             >
 
-            @if ($errors->get('email'))
-                <div class="text-danger small mt-1">
-                    {{ $errors->first('email') }}
-                </div>
-            @endif
-        </div>
+        </x-ui.field>
 
         {{-- BUTTON --}}
-        <div class="mt-4">
+        <x-ui.form-actions class="mt-4">
             <button type="submit"
                     class="btn text-white px-4"
                     style="background-color: #2563a6;">
                 Simpan Perubahan
             </button>
-        </div>
+        </x-ui.form-actions>
 
         @if (session('status') === 'profile-updated')
             <div class="alert alert-success mt-3 mb-0">
