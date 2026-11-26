@@ -97,6 +97,51 @@ class UnpaidBillsTest extends TestCase
         $this->assertDatabaseMissing('payments', ['id' => $id]);
     }
 
+    public function test_browser_shaped_dates_choose_range_over_month_and_validate_boundaries(): void
+    {
+        $outside = $this->bill('September', 2026, name: 'Andi');
+        $october = $this->bill('Oktober', 2026, name: 'Andi');
+        $november = $this->bill('November', 2026, name: 'Andi');
+        $this->bill('Oktober', 2026, name: 'Budi');
+        $this->actingAs(User::factory()->create(['role' => 'owner']));
+        $url = '/payments/unpaid?preset=all&month=2026-10&start=2026-10&end=2026-11&search=Andi';
+        $this->get($url)->assertOk()->assertViewHas('count', 2)->assertViewHas('total', 200)
+            ->assertViewHas('payments', fn ($rows) => $rows->pluck('id')->all() === [$october, $november])
+            ->assertViewHas('filters', fn ($filters) => $filters['preset'] === 'range' && !isset($filters['month']))
+            ->assertSee('start=2026-10')->assertSee('end=2026-11');
+        $this->get('/payments/unpaid?preset=all&start=2026-10&end=2026-11')
+            ->assertViewHas('count', 3);
+        $this->get('/payments/unpaid?preset=all&month=2026-10')->assertViewHas('count', 2);
+        $this->get('/payments/unpaid?preset=all&start=2026-10')->assertSessionHasErrors('end');
+        $this->get('/payments/unpaid?preset=all&end=2026-11')->assertSessionHasErrors('start');
+        $this->get('/payments/unpaid?preset=all&start=2026-12&end=2026-11')->assertSessionHasErrors('end');
+        $this->get('/payments/unpaid?preset=all&start=2026-13&end=2026-11')->assertSessionHasErrors('start');
+        $this->get('/payments/unpaid?preset=all&month=2026-13')->assertSessionHasErrors('month');
+        $this->assertDatabaseHas('payments', ['id' => $outside]);
+    }
+
+    public function test_explicit_modes_ignore_stale_fields_and_reset_all(): void
+    {
+        $this->travelTo(\Carbon\Carbon::parse('2026-11-20'));
+        $this->bill('Oktober', 2026, name: 'Andi');
+        $this->bill('November', 2026, name: 'Budi');
+        $this->bill('Desember', 2026, name: 'Andi');
+        $this->actingAs(User::factory()->create(['role' => 'owner']));
+        $stale = '&month=2026-10&start=2026-10&end=2026-11';
+        $this->get('/payments/unpaid?preset=all&period_explicit=1'.$stale)->assertOk()
+            ->assertViewHas('count', 3)->assertViewHas('total', 300)
+            ->assertViewHas('filters', fn ($filters) => $filters === ['preset' => 'all']);
+        $this->get('/payments/unpaid?preset=current'.$stale)->assertViewHas('count', 1)
+            ->assertViewHas('filters', fn ($filters) => $filters === ['preset' => 'current']);
+        $this->get('/payments/unpaid?preset=month'.$stale)->assertViewHas('count', 1)
+            ->assertViewHas('filters', fn ($filters) => $filters === ['preset' => 'month', 'month' => '2026-10']);
+        $this->get('/payments/unpaid?preset=range'.$stale)->assertViewHas('count', 2)
+            ->assertViewHas('filters', fn ($filters) => $filters === ['preset' => 'range', 'start' => '2026-10', 'end' => '2026-11']);
+        $this->get('/payments/unpaid?preset=all&period_explicit=1'.$stale.'&search=Andi')
+            ->assertViewHas('count', 2)->assertViewHas('total', 200);
+        $this->get('/payments/unpaid')->assertViewHas('count', 3);
+    }
+
     private function bill(string $month, int $year, int $amount = 100, string $status = 'belum_bayar', string $name = 'Test Customer'): int
     {
         $package = DB::table('packages')->insertGetId(['nama_paket' => 'Test', 'kecepatan' => '10 Mbps', 'harga' => 100]);
