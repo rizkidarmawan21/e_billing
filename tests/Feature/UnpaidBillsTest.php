@@ -47,10 +47,10 @@ class UnpaidBillsTest extends TestCase
             ->assertSee('href="'.url('/payments/unpaid').'">Reset', false);
     }
 
-    public function test_only_owner_can_access_and_invalid_month_is_rejected(): void
+    public function test_only_owner_and_admin_can_access_and_invalid_month_is_rejected(): void
     {
         $this->get('/payments/unpaid')->assertRedirect('/login');
-        $this->actingAs(User::factory()->create(['role' => 'admin']))->get('/payments/unpaid')->assertForbidden();
+        $this->actingAs(User::factory()->create(['role' => 'admin']))->get('/payments/unpaid')->assertOk();
         $this->actingAs(User::factory()->create(['role' => 'guest']))->get('/payments/unpaid')->assertForbidden();
         $this->actingAs(User::factory()->create(['role' => 'owner']))
             ->get('/payments/unpaid?filter_active=1&months[]=Invalid')->assertSessionHasErrors('months.0');
@@ -67,6 +67,30 @@ class UnpaidBillsTest extends TestCase
         $this->delete('/payments/'.$id, ['from_unpaid' => '1', 'filter_active' => '1', 'months' => ['Januari']])
             ->assertRedirect('/payments/unpaid?filter_active=1&months%5B0%5D=Januari');
         $this->get($url)->assertViewHas('count', 0);
+    }
+
+    public function test_admin_layout_filters_pagination_and_action_returns(): void
+    {
+        $this->travelTo(\Carbon\Carbon::parse('2025-06-20'));
+        for ($n = 1; $n <= 11; $n++) {
+            $id = $this->bill('Januari', 2025, 100, name: sprintf('Andi %02d', $n));
+        }
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
+        $query = 'filter_active=1&months%5B0%5D=Januari&search=Andi&page=2';
+        $return = '/payments/unpaid?'.$query;
+        $this->get('/payments/unpaid?filter_active=1&months[]=Januari&search=Andi')
+            ->assertOk()->assertSee('Sistem Billing')->assertSee('Tagihan Unpaid')
+            ->assertSee('page=2')->assertSee('months%5B0%5D=Januari')->assertSee('pagination');
+        $this->get($return)->assertOk()->assertSee('Andi 11')->assertDontSee('Andi 01');
+        $this->get('/payments/'.$id.'?from_unpaid=1&'.$query)->assertOk()->assertSee('payments/unpaid?', false);
+        $this->get('/payments/'.$id.'/edit?from_unpaid=1&'.$query)->assertOk()->assertSee('payments/unpaid?', false);
+        $bill = DB::table('payments')->find($id);
+        $this->put('/payments/'.$id.'?from_unpaid=1&'.$query, [
+            'customer_id' => $bill->customer_id, 'package_id' => $bill->package_id,
+            'periode' => 'Januari', 'tahun' => 2025, 'jumlah_tagihan' => 100, 'status' => 'lunas',
+        ])->assertRedirect('/payments/unpaid?filter_active=1&search=Andi&page=2&months%5B0%5D=Januari');
+        $this->delete('/payments/'.$id, ['from_unpaid' => '1', 'filter_active' => '1', 'months' => ['Januari'], 'search' => 'Andi', 'page' => 2])
+            ->assertRedirect('/payments/unpaid?filter_active=1&search=Andi&page=2&months%5B0%5D=Januari');
     }
 
     private function bill(string $month, int $year, int $amount = 100, string $status = 'belum_bayar', string $name = 'Test Customer'): int

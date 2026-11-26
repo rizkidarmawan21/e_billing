@@ -78,6 +78,10 @@
                 <span class="ms-2">Payment</span>
 
             </a>
+            <a href="{{ route('payments.unpaid') }}"
+               class="nav-link text-white rounded px-3 py-3">
+                <span class="ms-2">Tagihan Unpaid</span>
+            </a>
 
         </nav>
 

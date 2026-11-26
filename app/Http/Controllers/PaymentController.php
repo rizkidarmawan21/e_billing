@@ -294,7 +294,7 @@ if ($request->status === 'lunas') {
             'search' => ['nullable', 'string', 'max:255'],
             'page' => ['nullable', 'integer', 'min:1'],
         ])->validate();
-        $returnUrl = $request->user()->role === 'owner' && $request->query('from_unpaid') === '1' ? route('payments.unpaid', $returnFilters) : route('payments.index');
+        $returnUrl = in_array($request->user()->role, ['owner', 'admin'], true) && $request->query('from_unpaid') === '1' ? route('payments.unpaid', $returnFilters) : route('payments.index');
 
 if ($request->status === 'lunas') {
     $request->merge([
@@ -346,7 +346,7 @@ if ($request->status === 'lunas') {
         ])->validate();
         $payment->delete();
 
-        return redirect($request->user()->role === 'owner' && $request->input('from_unpaid') === '1' ? route('payments.unpaid', $filters) : route('payments.index'))
+        return redirect(in_array($request->user()->role, ['owner', 'admin'], true) && $request->input('from_unpaid') === '1' ? route('payments.unpaid', $filters) : route('payments.index'))
             ->with('success', 'Tagihan berhasil dihapus.');
     }
 }
