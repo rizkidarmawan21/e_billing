@@ -161,6 +161,7 @@
                                 <td class="text-center" data-label="Aksi">
 
                                     <div class="record-actions d-flex flex-wrap justify-content-center gap-2">
+                                        <x-ui.row-action action="detail" :href="route('customers.show', $customer)" :label="'Detail customer '.$customer->nama" />
 
                                         <!-- EDIT -->
                                         <x-ui.row-action action="edit" :href="route('customers.edit', $customer)" :label="'Edit customer '.$customer->nama" />

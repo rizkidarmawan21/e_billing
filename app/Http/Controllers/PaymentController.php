@@ -262,28 +262,12 @@ if ($request->status === 'lunas') {
      * Menampilkan detail tagihan.
      */
     public function show(Request $request, Payment $payment)
-{
-    $payment->load(['customer', 'package']);
+    {
+        $payment->load(['customer', 'package']);
+        $returnUrl = $this->paymentListUrl($request->query(), $request->query(), $payment->customer_id);
 
-    $customer = $payment->customer;
-
-    $customer->load([
-        'package',
-        'payments' => function ($query) {
-            $query->with('package')
-                  ->orderByDesc('tahun')
-                  ->orderByDesc('id');
-        }
-    ]);
-
-    $returnUrl = $this->paymentListUrl($request->query(), $request->query());
-
-    return view('payments.show', compact(
-        'payment',
-        'customer',
-        'returnUrl'
-    ));
-}
+        return view('payments.show', compact('payment', 'returnUrl'));
+    }
 
     /**
      * Form edit tagihan.
@@ -293,7 +277,7 @@ if ($request->status === 'lunas') {
         $customers = Customer::orderBy('nama')->get();
         $packages = Package::orderBy('harga')->get();
 
-        $returnUrl = $this->paymentListUrl($request->query(), $request->query());
+        $returnUrl = $this->paymentListUrl($request->query(), $request->query(), $payment->customer_id);
 
         return view('payments.edit', compact(
             'payment',
@@ -315,7 +299,7 @@ if ($request->status === 'lunas') {
             'search' => ['nullable', 'string', 'max:255'],
             'page' => ['nullable', 'integer', 'min:1'],
         ])->validate();
-        $returnUrl = $this->paymentListUrl($request->query(), $returnFilters);
+        $returnUrl = $this->paymentListUrl($request->query(), $returnFilters, $payment->customer_id);
 
 if ($request->status === 'lunas') {
     $request->merge([
@@ -367,12 +351,19 @@ if ($request->status === 'lunas') {
         ])->validate();
         $payment->delete();
 
-        return redirect($this->paymentListUrl($request->all(), $filters))
+        return redirect($this->paymentListUrl($request->all(), $filters, $payment->customer_id))
             ->with('success', 'Tagihan berhasil dihapus.');
     }
 
-    private function paymentListUrl(array $context, array $filters): string
+    private function paymentListUrl(array $context, array $filters, int $customerId): string
     {
+        if (($context['from_customer'] ?? null) === '1') {
+            $page = filter_var($context['history_page'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 2]]);
+
+            return route('customers.show', ['customer' => $customerId] + ($page ? ['history_page' => $page] : []))
+                .'#riwayat-tagihan';
+        }
+
         return match (true) {
             ($context['from_unpaid'] ?? null) === '1' => route('payments.unpaid', Arr::except($filters, ['from_unpaid', 'from_paid'])),
             ($context['from_paid'] ?? null) === '1' => route('payments.paid', Arr::only($filters, ['search', 'page'])),

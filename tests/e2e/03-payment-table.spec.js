@@ -14,6 +14,49 @@ for (const role of ['owner', 'admin']) {
     expect(response.status()).toBe(302);
     expect(response.headers().location).toMatch(role === 'owner' ? /\/owner\/dashboard$/ : /\/dashboard$/);
 
+    await healthy(page, '/customers?search=Mobile+Customer+01');
+    const customerDetail = page.getByRole('link', { name: /^Detail customer Mobile Customer 01/ });
+    await expect(customerDetail.locator('.bi-eye')).toBeVisible();
+    await customerDetail.click();
+    await expect(page).toHaveURL(/\/customers\/1$/);
+    await expect(page.getByRole('heading', { name: 'Profil Pelanggan' })).toBeVisible();
+    await expect(page.getByText('081234567890', { exact: true })).toBeVisible();
+    const history = page.getByRole('region', { name: 'Daftar riwayat tagihan' });
+    const bills = history.locator('tbody tr');
+    await expect(bills).toHaveCount(2);
+    await expect(bills.first()).toContainText('Februari');
+    const january = bills.filter({ hasText: 'Januari' });
+    await expect(january).toContainText('Belum Bayar');
+    await expect(january.getByRole('link', { name: 'Edit', exact: true })).toBeVisible();
+    await expect(january.getByRole('button', { name: 'Hapus', exact: true })).toBeVisible();
+    await january.getByRole('link', { name: 'Detail', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Tagihan #1' })).toBeVisible();
+    await expect(page.getByText(/^Januari \d{4}$/)).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Riwayat Tagihan' })).toHaveCount(0);
+    const paymentDetailUrl = page.url();
+    const paymentActions = page.getByRole('region', { name: 'Informasi Tagihan' });
+    const [editLayout, deleteLayout] = await paymentActions.locator('.form-actions .btn').evaluateAll(buttons => buttons.map(button => {
+      const text = document.createRange();
+      text.selectNodeContents(button);
+      const box = button.getBoundingClientRect();
+      const label = text.getBoundingClientRect();
+      return { y: box.y, height: box.height, labelOffset: label.top - box.top };
+    }));
+    expect(editLayout.height).toBe(deleteLayout.height);
+    expect(Math.abs(editLayout.labelOffset - deleteLayout.labelOffset)).toBeLessThanOrEqual(0.5);
+    if (page.viewportSize().width >= 390) expect(editLayout.y).toBe(deleteLayout.y);
+    await paymentActions.getByRole('link', { name: 'Edit Payment', exact: true }).click();
+    await expect(page).toHaveURL(url => url.pathname === '/payments/1/edit' && url.searchParams.get('from_customer') === '1');
+    await page.goBack();
+    page.once('dialog', async dialog => {
+      expect(dialog.message()).toContain('tagihan #1');
+      await dialog.dismiss();
+    });
+    await paymentActions.getByRole('button', { name: 'Hapus Payment', exact: true }).click();
+    await expect(page).toHaveURL(paymentDetailUrl);
+    await page.getByRole('link', { name: 'Kembali', exact: true }).click();
+    await expect(page).toHaveURL(/\/customers\/1#riwayat-tagihan$/);
+
     for (const path of ['/customers', '/payments', '/payments/unpaid', '/payments/paid']) {
       await page.goto(path);
       const search = page.getByRole('textbox', { name: 'Cari Nama Customer' });
@@ -130,5 +173,12 @@ for (const role of ['owner', 'admin']) {
       await expect(packageCell).toHaveCSS('min-width', '144px');
       await expect(packageCell.locator('.package-name')).not.toHaveClass(/\bbadge\b/);
     }
+
+    await healthy(page, paymentDetailUrl);
+    page.once('dialog', dialog => dialog.accept());
+    await paymentActions.getByRole('button', { name: 'Hapus Payment', exact: true }).click();
+    await expect(page).toHaveURL(/\/customers\/1#riwayat-tagihan$/);
+    await expect(bills).toHaveCount(1);
+    await expect(bills.first()).toContainText('Februari');
   });
 }
