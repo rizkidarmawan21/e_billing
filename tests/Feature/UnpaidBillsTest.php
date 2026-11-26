@@ -88,9 +88,9 @@ class UnpaidBillsTest extends TestCase
         $this->put('/payments/'.$id.'?from_unpaid=1&'.$query, [
             'customer_id' => $bill->customer_id, 'package_id' => $bill->package_id,
             'periode' => 'Januari', 'tahun' => 2025, 'jumlah_tagihan' => 100, 'status' => 'lunas',
-        ])->assertRedirect($return);
+        ])->assertRedirect('/payments/unpaid?filter_active=1&search=Andi&page=2&months%5B0%5D=Januari');
         $this->delete('/payments/'.$id, ['from_unpaid' => '1', 'filter_active' => '1', 'months' => ['Januari'], 'search' => 'Andi', 'page' => 2])
-            ->assertRedirect($return);
+            ->assertRedirect('/payments/unpaid?filter_active=1&search=Andi&page=2&months%5B0%5D=Januari');
     }
 
     private function bill(string $month, int $year, int $amount = 100, string $status = 'belum_bayar', string $name = 'Test Customer'): int
