@@ -90,11 +90,19 @@ class CustomerController extends Controller
      * Menampilkan detail customer
      */
     public function show(Customer $customer)
-{
-    $customer->load(['package', 'payments']);
+    {
+        $customer->load('package');
+        $months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        $monthOrder = collect($months)->map(fn ($month, $index) => 'WHEN ? THEN '.($index + 1))->implode(' ');
+        $payments = $customer->payments()->with('package')
+            ->orderByDesc('tahun')
+            ->orderByRaw('CASE periode '.$monthOrder.' ELSE 0 END DESC', $months)
+            ->orderByDesc('id')
+            ->paginate(10, ['*'], 'history_page')->fragment('riwayat-tagihan');
 
-    return view('customers.show', compact('customer'));
-}
+        return view('customers.show', compact('customer', 'payments'));
+    }
 
 
     /**

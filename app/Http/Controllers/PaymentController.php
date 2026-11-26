@@ -6,6 +6,7 @@ use App\Models\Payment;
 use App\Models\Customer;
 use App\Models\Package;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 
@@ -127,6 +128,20 @@ public function index(Request $request)
     ));
 }
 
+    public function paid(Request $request)
+    {
+        $filters = $request->validate(['search' => ['nullable', 'string', 'max:255']]);
+        $payments = Payment::query()->with('customer')
+            ->where('status', 'lunas')
+            ->when(filled($filters['search'] ?? null), fn ($query) => $query->whereHas(
+                'customer', fn ($customer) => $customer->where('nama', 'like', '%'.$filters['search'].'%')
+            ))
+            ->orderByDesc('tanggal_bayar')->orderByDesc('id')
+            ->paginate(10)->appends($filters);
+
+        return view('payments.paid', compact('payments', 'filters'));
+    }
+
     /**
      * Form tambah tagihan.
      */
@@ -246,39 +261,29 @@ if ($request->status === 'lunas') {
     /**
      * Menampilkan detail tagihan.
      */
-    public function show(Payment $payment)
-{
-    $payment->load(['customer', 'package']);
+    public function show(Request $request, Payment $payment)
+    {
+        $payment->load(['customer', 'package']);
+        $returnUrl = $this->paymentListUrl($request->query(), $request->query(), $payment->customer_id);
 
-    $customer = $payment->customer;
-
-    $customer->load([
-        'package',
-        'payments' => function ($query) {
-            $query->with('package')
-                  ->orderByDesc('tahun')
-                  ->orderByDesc('id');
-        }
-    ]);
-
-    return view('payments.show', compact(
-        'payment',
-        'customer'
-    ));
-}
+        return view('payments.show', compact('payment', 'returnUrl'));
+    }
 
     /**
      * Form edit tagihan.
      */
-    public function edit(Payment $payment)
+    public function edit(Request $request, Payment $payment)
     {
         $customers = Customer::orderBy('nama')->get();
         $packages = Package::orderBy('harga')->get();
 
+        $returnUrl = $this->paymentListUrl($request->query(), $request->query(), $payment->customer_id);
+
         return view('payments.edit', compact(
             'payment',
             'customers',
-            'packages'
+            'packages',
+            'returnUrl'
         ));
     }
 
@@ -294,7 +299,7 @@ if ($request->status === 'lunas') {
             'search' => ['nullable', 'string', 'max:255'],
             'page' => ['nullable', 'integer', 'min:1'],
         ])->validate();
-        $returnUrl = in_array($request->user()->role, ['owner', 'admin'], true) && $request->query('from_unpaid') === '1' ? route('payments.unpaid', $returnFilters) : route('payments.index');
+        $returnUrl = $this->paymentListUrl($request->query(), $returnFilters, $payment->customer_id);
 
 if ($request->status === 'lunas') {
     $request->merge([
@@ -346,7 +351,23 @@ if ($request->status === 'lunas') {
         ])->validate();
         $payment->delete();
 
-        return redirect(in_array($request->user()->role, ['owner', 'admin'], true) && $request->input('from_unpaid') === '1' ? route('payments.unpaid', $filters) : route('payments.index'))
+        return redirect($this->paymentListUrl($request->all(), $filters, $payment->customer_id))
             ->with('success', 'Tagihan berhasil dihapus.');
+    }
+
+    private function paymentListUrl(array $context, array $filters, int $customerId): string
+    {
+        if (($context['from_customer'] ?? null) === '1') {
+            $page = filter_var($context['history_page'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 2]]);
+
+            return route('customers.show', ['customer' => $customerId] + ($page ? ['history_page' => $page] : []))
+                .'#riwayat-tagihan';
+        }
+
+        return match (true) {
+            ($context['from_unpaid'] ?? null) === '1' => route('payments.unpaid', Arr::except($filters, ['from_unpaid', 'from_paid'])),
+            ($context['from_paid'] ?? null) === '1' => route('payments.paid', Arr::only($filters, ['search', 'page'])),
+            default => route('payments.index'),
+        };
     }
 }

@@ -32,7 +32,7 @@
 
 
         {{-- HEADER HALAMAN --}}
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <x-ui.page-header>
 
             <div>
 
@@ -41,6 +41,7 @@
                 </p>
             </div>
 
+            <x-slot:actions>
             <a href="{{ route('packages.create') }}"
                class="btn btn-primary">
 
@@ -49,24 +50,24 @@
 
             </a>
 
-        </div>
-
+            </x-slot:actions>
+        </x-ui.page-header>
 
         {{-- TABEL PAKET --}}
         <div class="card border-0 shadow-sm">
 
             <div class="card-body p-0">
 
-                <div class="table-responsive">
+                <div class="table-responsive" tabindex="0" role="region" aria-label="Daftar paket">
 
-                    <table class="table table-hover align-middle mb-0">
+                    <x-ui.table>
 
                         <thead class="table-light">
 
                             <tr>
 
-                                <th class="px-4 py-3">
-                                    No
+                                <th class="px-4 py-3 text-center" scope="col">
+                                    No.
                                 </th>
 
                                 <th>
@@ -100,21 +101,21 @@
 
                                 <tr>
 
-                                    <td class="px-4">
+                                    <td class="px-4" data-label="No.">
                                         {{ $loop->iteration }}
                                     </td>
 
 
-                                    <td>
+                                    <td data-label="Nama Paket">
 
-                                        <strong>
+                                        <a href="{{ route('packages.show', $package) }}" class="fw-bold text-decoration-none">
                                             {{ $package->nama_paket }}
-                                        </strong>
+                                        </a>
 
                                     </td>
 
 
-                                    <td>
+                                    <td data-label="Kecepatan">
 
                                         <span class="badge bg-info text-dark">
                                             {{ $package->kecepatan }}
@@ -123,7 +124,7 @@
                                     </td>
 
 
-                                    <td>
+                                    <td data-label="Harga">
 
                                         <strong class="text-success">
                                             Rp{{ number_format($package->harga, 0, ',', '.') }}
@@ -132,23 +133,18 @@
                                     </td>
 
 
-                                    <td class="text-muted">
+                                    <td class="text-muted table-description" data-label="Deskripsi">
 
-                                        {{ $package->deskripsi ?? '-' }}
+                                        <div>{{ $package->deskripsi ?? '-' }}</div>
 
                                     </td>
 
 
-                                    <td class="text-center">
+                                    <td class="text-center" data-label="Aksi">
+                                        <div class="record-actions d-flex flex-wrap justify-content-center gap-2">
 
                                         {{-- EDIT --}}
-                                        <a href="{{ route('packages.edit', $package) }}"
-                                           class="btn btn-sm btn-warning me-1">
-
-                                            <i class="bi bi-pencil-square me-1"></i>
-                                            Edit
-
-                                        </a>
+                                        <x-ui.row-action action="edit" :href="route('packages.edit', $package)" />
 
 
                                         {{-- HAPUS --}}
@@ -160,16 +156,10 @@
                                             @csrf
                                             @method('DELETE')
 
-                                            <button type="submit"
-                                                    class="btn btn-sm btn-danger">
-
-                                                <i class="bi bi-trash me-1"></i>
-                                                Hapus
-
-                                            </button>
+                                            <x-ui.row-action action="delete" />
 
                                         </form>
-
+                                        </div>
                                     </td>
 
                                 </tr>
@@ -211,7 +201,7 @@
 
                         </tbody>
 
-                    </table>
+                    </x-ui.table>
 
                 </div>
 

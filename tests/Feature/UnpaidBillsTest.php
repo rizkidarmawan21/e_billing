@@ -79,7 +79,7 @@ class UnpaidBillsTest extends TestCase
         $query = 'filter_active=1&months%5B0%5D=Januari&search=Andi&page=2';
         $return = '/payments/unpaid?'.$query;
         $this->get('/payments/unpaid?filter_active=1&months[]=Januari&search=Andi')
-            ->assertOk()->assertSee('Sistem Billing')->assertSee('Tagihan Unpaid')
+            ->assertOk()->assertSee('Sistem Billing')->assertSee('Belum Bayar')
             ->assertSee('page=2')->assertSee('months%5B0%5D=Januari')->assertSee('pagination');
         $this->get($return)->assertOk()->assertSee('Andi 11')->assertDontSee('Andi 01');
         $this->get('/payments/'.$id.'?from_unpaid=1&'.$query)->assertOk()->assertSee('payments/unpaid?', false);

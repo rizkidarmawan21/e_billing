@@ -5,7 +5,7 @@
 @section('content')
 
     <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <x-ui.page-header>
 
         <div>
 
@@ -14,6 +14,7 @@
             </p>
         </div>
 
+        <x-slot:actions>
         <a href="{{ route('customers.create') }}"
            class="btn btn-primary">
 
@@ -22,77 +23,10 @@
 
         </a>
 
-    </div>
+        </x-slot:actions>
+    </x-ui.page-header>
 
-
-    <!-- SEARCH -->
-    <div class="card border-0 shadow-sm mb-4">
-
-        <div class="card-body">
-
-            <form method="GET"
-                  action="{{ route('customers.index') }}">
-
-                <div class="row align-items-end">
-
-                    <div class="col-md-8">
-
-                        <label for="search"
-                               class="form-label fw-semibold">
-
-                            Cari Nama Customer
-
-                        </label>
-
-                        <div class="input-group">
-
-                            <span class="input-group-text">
-                                <i class="bi bi-search"></i>
-                            </span>
-
-                            <input
-                                type="text"
-                                id="search"
-                                name="search"
-                                value="{{ $search }}"
-                                class="form-control"
-                                placeholder="Ketik nama customer...">
-
-                        </div>
-
-                    </div>
-
-                    <div class="col-md-4 mt-3 mt-md-0">
-
-                        <button type="submit"
-                                class="btn btn-primary me-2">
-
-                            <i class="bi bi-search me-1"></i>
-                            Cari
-
-                        </button>
-
-                        @if($search)
-
-                            <a href="{{ route('customers.index') }}"
-                               class="btn btn-outline-secondary">
-
-                                Reset
-
-                            </a>
-
-                        @endif
-
-                    </div>
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-
+    <x-ui.customer-search :action="route('customers.index')" :search="$search" />
 
     <!-- ALERT SUCCESS -->
     @if(session('success'))
@@ -106,7 +40,7 @@
 
             <button type="button"
                     class="btn-close"
-                    data-bs-dismiss="alert">
+                    data-bs-dismiss="alert" aria-label="Tutup notifikasi">
             </button>
 
         </div>
@@ -119,16 +53,16 @@
 
         <div class="card-body p-0">
 
-            <div class="table-responsive">
+            <div class="table-responsive" tabindex="0" role="region" aria-label="Daftar pelanggan">
 
-                <table class="table table-hover align-middle mb-0">
+                <x-ui.table>
 
                     <thead class="table-light">
 
                         <tr>
 
-                            <th class="px-4">
-                                No
+                            <th class="px-4 text-center" scope="col">
+                                No.
                             </th>
 
                             <th>
@@ -163,7 +97,7 @@
                             <tr>
 
                                 <!-- NOMOR -->
-                                <td class="px-4">
+                                <td class="px-4" data-label="No.">
 
                                     {{ $customers->firstItem() + $loop->index }}
 
@@ -171,7 +105,7 @@
 
 
                                 <!-- KODE -->
-                                <td>
+                                <td data-label="Kode Customer">
 
                                     <span class="fw-semibold">
                                         {{ $customer->kode_pelanggan }}
@@ -181,7 +115,7 @@
 
 
                                 <!-- NAMA -->
-                                <td>
+                                <td data-label="Nama Customer">
 
                                     <a href="{{ route('customers.show', $customer) }}"
                                        class="text-decoration-none fw-semibold">
@@ -194,7 +128,7 @@
 
 
                                 <!-- NO HP -->
-                                <td>
+                                <td data-label="No. HP">
 
                                     {{ $customer->no_hp ?? '-' }}
 
@@ -202,11 +136,11 @@
 
 
                                 <!-- PAKET -->
-                                <td>
+                                <td data-label="Paket">
 
                                     @if($customer->package)
 
-                                        <span class="badge bg-primary">
+                                        <span class="package-name">
 
                                             {{ $customer->package->nama_paket }}
 
@@ -224,18 +158,13 @@
 
 
                                 <!-- AKSI -->
-                                <td class="text-center">
+                                <td class="text-center" data-label="Aksi">
 
-                                    <div class="d-flex justify-content-center gap-2">
+                                    <div class="record-actions d-flex flex-wrap justify-content-center gap-2">
+                                        <x-ui.row-action action="detail" :href="route('customers.show', $customer)" :label="'Detail customer '.$customer->nama" />
 
                                         <!-- EDIT -->
-                                        <a href="{{ route('customers.edit', $customer) }}"
-                                           class="btn btn-sm btn-outline-primary"
-                                           title="Edit">
-
-                                            <i class="bi bi-pencil"></i>
-
-                                        </a>
+                                        <x-ui.row-action action="edit" :href="route('customers.edit', $customer)" :label="'Edit customer '.$customer->nama" />
 
 
                                         <!-- HAPUS -->
@@ -247,14 +176,7 @@
                                             @csrf
                                             @method('DELETE')
 
-                                            <button
-                                                type="submit"
-                                                class="btn btn-sm btn-outline-danger"
-                                                title="Hapus">
-
-                                                <i class="bi bi-trash"></i>
-
-                                            </button>
+                                            <x-ui.row-action action="delete" :label="'Hapus customer '.$customer->nama" />
 
                                         </form>
 
@@ -303,7 +225,7 @@
 
                     </tbody>
 
-                </table>
+                </x-ui.table>
 
             </div>
 

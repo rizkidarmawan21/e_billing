@@ -5,7 +5,7 @@
 <div class="container-fluid">
 
     {{-- HEADER --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <x-ui.page-header>
 
         <div>
             <h4 class="fw-bold mb-1">
@@ -17,15 +17,16 @@
             </p>
         </div>
 
+        <x-slot:actions>
         <a href="{{ route('packages.index') }}"
-           class="btn btn-secondary">
+           class="btn btn-outline-secondary">
 
             ← Kembali
 
         </a>
 
-    </div>
-
+        </x-slot:actions>
+    </x-ui.page-header>
 
     {{-- FORM --}}
     <div class="card border-0 shadow-sm">
@@ -71,83 +72,60 @@
 
 
                 {{-- NAMA PAKET --}}
-                <div class="mb-3">
-
-                    <label class="form-label fw-semibold">
-                        Nama Paket
-                    </label>
-
+                <x-ui.field name="nama_paket" label="Nama Paket" :required="true">
                     <input
                         type="text"
                         name="nama_paket"
+                        id="nama_paket"
                         class="form-control"
                         value="{{ old('nama_paket', $package->nama_paket) }}"
                         required
                     >
 
-                </div>
-
+                </x-ui.field>
 
                 {{-- KECEPATAN --}}
-                <div class="mb-3">
-
-                    <label class="form-label fw-semibold">
-                        Kecepatan
-                    </label>
-
+                <x-ui.field name="kecepatan" label="Kecepatan" :required="true">
                     <input
                         type="text"
                         name="kecepatan"
+                        id="kecepatan"
                         class="form-control"
                         value="{{ old('kecepatan', $package->kecepatan) }}"
                         required
                     >
 
-                </div>
-
+                </x-ui.field>
 
                 {{-- HARGA --}}
-                <div class="mb-3">
-
-                    <label class="form-label fw-semibold">
-                        Harga
-                    </label>
-
+                <x-ui.field name="harga" label="Harga" :required="true" help="Masukkan harga tanpa tanda titik atau koma.">
                     <input
                         type="number"
                         name="harga"
+                        id="harga"
+                        aria-describedby="harga-help{{ $errors->has('harga') ? ' harga-error' : '' }}"
                         class="form-control"
                         value="{{ old('harga', $package->harga) }}"
                         min="0"
                         required
                     >
 
-                    <small class="text-muted">
-                        Masukkan harga tanpa tanda titik atau koma.
-                    </small>
-
-                </div>
-
+                </x-ui.field>
 
                 {{-- DESKRIPSI --}}
-                <div class="mb-4">
-
-                    <label class="form-label fw-semibold">
-                        Deskripsi
-                    </label>
-
+                <x-ui.field name="deskripsi" label="Deskripsi" class="mb-4">
                     <textarea
                         name="deskripsi"
+                        id="deskripsi"
                         class="form-control"
                         rows="4"
                         placeholder="Deskripsi paket (opsional)"
                     >{{ old('deskripsi', $package->deskripsi) }}</textarea>
 
-                </div>
-
+                </x-ui.field>
 
                 {{-- TOMBOL --}}
-                <div class="d-flex gap-2">
+                <x-ui.form-actions>
 
                     <button
                         type="submit"
@@ -159,12 +137,12 @@
 
                     <a
                         href="{{ route('packages.index') }}"
-                        class="btn btn-secondary"
+                        class="btn btn-outline-secondary"
                     >
                         Batal
                     </a>
 
-                </div>
+                </x-ui.form-actions>
 
             </form>
 

@@ -30,7 +30,9 @@ class OwnerController extends Controller
             12 => 'Desember',
     
         ];
-        $tahun = now()->year;
+        $currentDate = now();
+        $tahun = $currentDate->year;
+        $currentMonth = $namaBulan[$currentDate->month];
 
 
     // ======================================================
@@ -259,6 +261,21 @@ foreach ($paketList as $paket) {
         // KIRIM DATA KE VIEW
         // ==========================================
 
+        $customersWithoutBills = Customer::query()
+            ->whereHas('package')
+            ->whereDoesntHave('payments', fn ($query) => $query
+                ->where('tahun', $tahun)
+                ->where('periode', $currentMonth))
+            ->with('package:id,nama_paket')
+            ->orderBy('nama')->orderBy('id')
+            ->paginate(5, ['id', 'nama', 'package_id'], 'missing_bills_page')
+            ->appends(array_filter([
+                'all' => $showAll ? 1 : null,
+                'filter_active' => $filterActive ? 1 : null,
+                'months' => $selectedMonths,
+            ]))
+            ->fragment('tagihan-belum-dibuat');
+
         return view('owner.dashboard', compact(
             'totalUsers',
             'totalTagihan',
@@ -275,7 +292,9 @@ foreach ($paketList as $paket) {
             'statusPembayaran',
             'distribusiPaket',
             'tagihanVsPendapatan',
-            'showAll'
+            'showAll',
+            'currentMonth',
+            'customersWithoutBills'
         ));
     }
       public function laporan(Request $request)

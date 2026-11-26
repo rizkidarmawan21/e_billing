@@ -1,7 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './bootstrap';
 import Alpine from 'alpinejs';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import { Offcanvas } from 'bootstrap';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import { Chart } from 'chart.js/auto';
@@ -12,6 +12,16 @@ Alpine.start();
 
 
 document.addEventListener('DOMContentLoaded', function () {
+
+    const panelNavigation = document.getElementById('panelNavigation');
+    if (panelNavigation) {
+        const desktopLayout = window.matchMedia('(min-width: 992px)');
+        desktopLayout.addEventListener('change', ({ matches }) => {
+            if (matches) {
+                Offcanvas.getInstance(panelNavigation)?.hide();
+            }
+        });
+    }
 
     // ==========================================
     // DIAGRAM TAGIHAN DAN PENDAPATAN

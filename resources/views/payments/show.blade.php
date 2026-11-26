@@ -3,444 +3,53 @@
 @section('header', 'Detail Payment')
 
 @section('content')
-
 <div class="container-fluid">
+    <x-ui.page-header title="Tagihan #{{ $payment->id }}" description="{{ $payment->periode }} {{ $payment->tahun }}">
+        <x-slot:actions>
+            <a href="{{ $returnUrl }}" class="btn btn-outline-secondary">Kembali</a>
+        </x-slot:actions>
+    </x-ui.page-header>
 
-    {{-- HEADER --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <div>
-
-            <h4 class="fw-bold mb-1">
-                Detail Customer
-            </h4>
-
-            <p class="text-muted mb-0">
-                Informasi customer dan riwayat tagihan pembayaran.
-            </p>
-
-        </div>
-
-
-        <a href="{{ (request('from_unpaid') === '1' ? route('payments.unpaid', request()->except('from_unpaid')) : route('payments.index')) }}"
-           class="btn btn-secondary">
-
-            ← Kembali
-
-        </a>
-
-    </div>
-
-
-    <div class="row g-4">
-
-        {{-- INFORMASI CUSTOMER --}}
-        <div class="col-md-6">
-
-            <div class="card border-0 shadow-sm h-100">
-
-                <div class="card-header bg-primary text-white">
-
-                    <h5 class="mb-0">
-                        👤 Informasi Customer
-                    </h5>
-
+    <section class="card border-0 shadow-sm" aria-labelledby="payment-details-title">
+        <div class="card-body p-3 p-sm-4">
+            <h2 id="payment-details-title" class="h5 fw-bold mb-3">Informasi Tagihan</h2>
+            <dl class="row g-3 mb-0">
+                <div class="col-sm-6">
+                    <dt class="text-muted">Pelanggan</dt>
+                    <dd class="mb-0">
+                        <a href="{{ route('customers.show', $payment->customer) }}" class="fw-semibold">{{ $payment->customer->nama }}</a>
+                        <div class="small text-muted">{{ $payment->customer->kode_pelanggan }}</div>
+                    </dd>
                 </div>
-
-
-                <div class="card-body">
-
-                    <div class="mb-3">
-
-                        <small class="text-muted">
-                            Kode Customer
-                        </small>
-
-                        <div class="fw-semibold">
-                            {{ $customer->kode_pelanggan ?? '-' }}
-                        </div>
-
-                    </div>
-
-
-                    <div class="mb-3">
-
-                        <small class="text-muted">
-                            Nama Customer
-                        </small>
-
-                        <div class="fw-semibold">
-                            {{ $customer->nama ?? '-' }}
-                        </div>
-
-                    </div>
-
-
-                    <div class="mb-3">
-
-                        <small class="text-muted">
-                            No. HP
-                        </small>
-
-                        <div>
-                            {{ $customer->no_hp ?? '-' }}
-                        </div>
-
-                    </div>
-
-
-                    <div>
-
-                        <small class="text-muted">
-                            Alamat
-                        </small>
-
-                        <div>
-                            {{ $customer->alamat ?? '-' }}
-                        </div>
-
-                    </div>
-
+                <div class="col-sm-6">
+                    <dt class="text-muted">Paket pada Tagihan</dt>
+                    <dd class="mb-0">{{ $payment->package?->nama_paket ?? '-' }}</dd>
                 </div>
-
-            </div>
-
-        </div>
-
-
-        {{-- INFORMASI PAKET --}}
-        <div class="col-md-6">
-
-            <div class="card border-0 shadow-sm h-100">
-
-                <div class="card-header bg-info text-white">
-
-                    <h5 class="mb-0">
-                        📦 Informasi Paket
-                    </h5>
-
+                <div class="col-sm-6">
+                    <dt class="text-muted">Nominal Tagihan</dt>
+                    <dd class="fw-bold text-primary mb-0">Rp {{ number_format($payment->jumlah_tagihan, 0, ',', '.') }}</dd>
                 </div>
-
-
-                <div class="card-body">
-
-                    <div class="mb-3">
-
-                        <small class="text-muted">
-                            Nama Paket
-                        </small>
-
-                        <div class="fw-semibold">
-                            {{ $customer->package->nama_paket ?? '-' }}
-                        </div>
-
-                    </div>
-
-
-                    <div class="mb-3">
-
-                        <small class="text-muted">
-                            Kecepatan
-                        </small>
-
-                        <div>
-                            {{ $customer->package->kecepatan ?? '-' }}
-                        </div>
-
-                    </div>
-
-
-                    <div>
-
-                        <small class="text-muted">
-                            Harga Paket Saat Ini
-                        </small>
-
-                        <div class="fw-bold text-primary fs-5">
-
-                            Rp
-                            {{ number_format(
-                                $customer->package->harga ?? 0,
-                                0,
-                                ',',
-                                '.'
-                            ) }}
-
-                        </div>
-
-                    </div>
-
+                <div class="col-sm-6">
+                    <dt class="text-muted">Status</dt>
+                    <dd class="mb-0"><x-ui.payment-status :status="$payment->status" /></dd>
                 </div>
-
-            </div>
-
-        </div>
-
-
-        {{-- RIWAYAT TAGIHAN --}}
-        <div class="col-12">
-
-            <div class="card border-0 shadow-sm">
-
-                <div class="card-header bg-light">
-
-                    <h5 class="fw-bold mb-1">
-                        💳 Riwayat Tagihan
-                    </h5>
-
-                    <small class="text-muted">
-                        Seluruh tagihan customer berdasarkan periode.
-                    </small>
-
+                <div class="col-sm-6">
+                    <dt class="text-muted">Tanggal Bayar</dt>
+                    <dd class="mb-0">{{ $payment->tanggal_bayar?->format('d-m-Y') ?? '-' }}</dd>
                 </div>
-
-
-                <div class="card-body p-0">
-
-                    <div class="table-responsive">
-
-                        <table class="table table-hover align-middle mb-0">
-
-                            <thead class="table-light">
-
-                                <tr>
-
-                                    <th class="px-4 py-3">
-                                        No
-                                    </th>
-
-                                    <th>
-                                        Periode
-                                    </th>
-
-                                    <th>
-                                        Paket
-                                    </th>
-
-                                    <th>
-                                        Jumlah Tagihan
-                                    </th>
-
-                                    <th>
-                                        Status
-                                    </th>
-
-                                    <th>
-                                        Tanggal Bayar
-                                    </th>
-
-                                    <th class="text-center">
-                                        Aksi
-                                    </th>
-
-                                </tr>
-
-                            </thead>
-
-
-                            <tbody>
-
-                                @forelse ($customer->payments as $history)
-
-                                    <tr>
-
-                                        {{-- NO --}}
-                                        <td class="px-4">
-
-                                            {{ $loop->iteration }}
-
-                                        </td>
-
-
-                                        {{-- PERIODE --}}
-                                        <td>
-
-                                            <strong>
-                                                {{ $history->periode }}
-                                                {{ $history->tahun }}
-                                            </strong>
-
-                                        </td>
-
-
-                                        {{-- PAKET --}}
-                                        <td>
-
-                                            {{ $history->package->nama_paket ?? '-' }}
-
-                                            @if ($history->package)
-
-                                                <div class="small text-muted">
-
-                                                    {{ $history->package->kecepatan }}
-
-                                                </div>
-
-                                            @endif
-
-                                        </td>
-
-
-                                        {{-- JUMLAH --}}
-                                        <td>
-
-                                            <strong class="text-primary">
-
-                                                Rp
-                                                {{ number_format(
-                                                    $history->jumlah_tagihan,
-                                                    0,
-                                                    ',',
-                                                    '.'
-                                                ) }}
-
-                                            </strong>
-
-                                        </td>
-
-
-                                        {{-- STATUS --}}
-                                        <td>
-
-                                            @if ($history->status === 'lunas')
-
-                                                <span class="badge bg-success px-3 py-2">
-
-                                                    ✓ Lunas
-
-                                                </span>
-
-                                            @else
-
-                                                <span class="badge bg-danger px-3 py-2">
-
-                                                    ✕ Belum Lunas
-
-                                                </span>
-
-                                            @endif
-
-                                        </td>
-
-
-                                        {{-- TANGGAL BAYAR --}}
-                                        <td>
-
-                                            @if ($history->tanggal_bayar)
-
-                                                {{ $history->tanggal_bayar->format('d-m-Y') }}
-
-                                            @else
-
-                                                <span class="text-muted">
-                                                    -
-                                                </span>
-
-                                            @endif
-
-                                        </td>
-
-
-                                        {{-- AKSI --}}
-                                       <td class="text-center">
-    <a href="{{ route('payments.edit', array_merge(['payment' => $history], request()->except('payment'))) }}"
-       class="btn btn-sm btn-warning me-1">
-        Edit
-    </a>
-
-    <form action="{{ route('payments.destroy', array_merge(['payment' => $history], request()->except('payment'))) }}"
-          method="POST"
-          class="d-inline"
-          onsubmit="return confirm('Yakin ingin menghapus riwayat pembayaran {{ $history->periode }} {{ $history->tahun }}?');">
-        @csrf
-        @method('DELETE')
-
-        <button type="submit" class="btn btn-sm btn-danger">
-            Hapus
-        </button>
-    </form>
-</td>
-
-                                    </tr>
-
-                                @empty
-
-                                    <tr>
-
-                                        <td colspan="7"
-                                            class="text-center py-5">
-
-                                            <div class="text-muted">
-
-                                                <div class="fs-1 mb-3">
-                                                    💳
-                                                </div>
-
-                                                <h5>
-                                                    Belum ada riwayat tagihan
-                                                </h5>
-
-                                                <p class="mb-0">
-                                                    Customer belum memiliki data tagihan.
-                                                </p>
-
-                                            </div>
-
-                                        </td>
-
-                                    </tr>
-
-                                @endforelse
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        {{-- TOMBOL --}}
-        <div class="col-12">
-
-            <div class="d-flex gap-2">
-
-                <a href="{{ route('payments.edit', array_merge(['payment' => $payment], request()->except('payment'))) }}"
-                   class="btn btn-warning">
-
-                    ✏️ Edit Payment
-
-                </a>
-
-
-                <form action="{{ route('payments.destroy', array_merge(['payment' => $payment], request()->except('payment'))) }}"
-                      method="POST"
-                      class="d-inline"
-                      onsubmit="return confirm('Yakin ingin menghapus payment ini?');">
-
+            </dl>
+
+            @php($actionParams = ['payment' => $payment] + request()->only(['from_customer', 'history_page', 'from_unpaid', 'from_paid', 'filter_active', 'months', 'search', 'page']))
+            <x-ui.form-actions class="border-top pt-3">
+                <a href="{{ route('payments.edit', $actionParams) }}" class="btn btn-outline-secondary d-inline-flex align-items-center justify-content-center">Edit Payment</a>
+                <form action="{{ route('payments.destroy', $actionParams) }}" method="POST"
+                      onsubmit="return confirm('Yakin ingin menghapus tagihan #{{ $payment->id }}?')">
                     @csrf
                     @method('DELETE')
-
-                    <button type="submit"
-                            class="btn btn-danger">
-
-                        🗑️ Hapus Payment
-
-                    </button>
-
+                    <button type="submit" class="btn btn-outline-danger d-inline-flex align-items-center justify-content-center">Hapus Payment</button>
                 </form>
-
-            </div>
-
+            </x-ui.form-actions>
         </div>
-
-    </div>
-
+    </section>
 </div>
-
 @endsection

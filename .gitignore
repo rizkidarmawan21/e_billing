@@ -17,3 +17,10 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+/test-results/
+/playwright-report/
+/tests/e2e/.tmp/
+/tests/e2e/.artifacts/
+/tests/e2e/artifacts/
+/tests/e2e/.auth/
+/storage/app/mobile-demo.sqlite*

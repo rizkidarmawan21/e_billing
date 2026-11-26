@@ -6,10 +6,10 @@
 
 <div class="card border-0 shadow-sm">
 
-    <div class="card-body p-4">
+    <div class="card-body p-3 p-md-4">
 
         {{-- HEADER --}}
-        <div class="mb-4">
+        <x-ui.page-header>
             <h5 class="fw-semibold mb-1">
                 Edit Admin
             </h5>
@@ -17,8 +17,7 @@
             <p class="text-muted mb-0">
                 Ubah informasi akun administrator.
             </p>
-        </div>
-
+        </x-ui.page-header>
 
         {{-- FORM --}}
         <form method="POST"
@@ -29,13 +28,7 @@
 
 
             {{-- NAMA --}}
-            <div class="mb-3">
-
-                <label for="name"
-                       class="form-label fw-semibold">
-                    Nama
-                </label>
-
+            <x-ui.field name="name" label="Nama" :required="true">
                 <input type="text"
                        id="name"
                        name="name"
@@ -43,23 +36,11 @@
                        value="{{ old('name', $user->name) }}"
                        required>
 
-                @error('name')
-                    <div class="text-danger small mt-1">
-                        {{ $message }}
-                    </div>
-                @enderror
-
-            </div>
+            </x-ui.field>
 
 
             {{-- EMAIL --}}
-            <div class="mb-3">
-
-                <label for="email"
-                       class="form-label fw-semibold">
-                    Email
-                </label>
-
+            <x-ui.field name="email" label="Email" :required="true">
                 <input type="email"
                        id="email"
                        name="email"
@@ -67,13 +48,7 @@
                        value="{{ old('email', $user->email) }}"
                        required>
 
-                @error('email')
-                    <div class="text-danger small mt-1">
-                        {{ $message }}
-                    </div>
-                @enderror
-
-            </div>
+            </x-ui.field>
 
 
             {{-- PASSWORD --}}
@@ -87,24 +62,8 @@
                     </span>
                 </label>
 
-                <div class="input-group">
-
-                    <input type="password"
-                           id="password"
-                           name="password"
-                           class="form-control"
-                           placeholder="Kosongkan jika tidak diubah">
-
-                    <button type="button"
-                            class="btn btn-outline-secondary"
-                            onclick="togglePassword('password', 'passwordIcon')">
-
-                        <i class="bi bi-eye"
-                           id="passwordIcon"></i>
-
-                    </button>
-
-                </div>
+                <x-ui.password-input id="password" name="password" class="form-control"
+                    placeholder="Kosongkan jika tidak diubah" autocomplete="new-password" />
 
                 @error('password')
                     <div class="text-danger small mt-1">
@@ -123,33 +82,17 @@
                     Konfirmasi Password Baru
                 </label>
 
-                <div class="input-group">
-
-                    <input type="password"
-                           id="password_confirmation"
-                           name="password_confirmation"
-                           class="form-control"
-                           placeholder="Ulangi password baru">
-
-                    <button type="button"
-                            class="btn btn-outline-secondary"
-                            onclick="togglePassword('password_confirmation', 'confirmPasswordIcon')">
-
-                        <i class="bi bi-eye"
-                           id="confirmPasswordIcon"></i>
-
-                    </button>
-
-                </div>
+                <x-ui.password-input id="password_confirmation" name="password_confirmation"
+                    class="form-control" placeholder="Ulangi password baru" autocomplete="new-password" />
 
             </div>
 
 
             {{-- TOMBOL --}}
-            <div class="d-flex justify-content-end gap-2">
+            <x-ui.form-actions class="justify-content-md-end">
 
                 <a href="{{ route('owner.admin.index') }}"
-                   class="btn btn-secondary">
+                   class="btn btn-outline-secondary">
                     Batal
                 </a>
 
@@ -159,7 +102,7 @@
                     Simpan Perubahan
                 </button>
 
-            </div>
+            </x-ui.form-actions>
 
         </form>
 
@@ -167,32 +110,5 @@
 
 </div>
 
-
-{{-- JAVASCRIPT PASSWORD --}}
-<script>
-
-function togglePassword(inputId, iconId)
-{
-    const input = document.getElementById(inputId);
-    const icon = document.getElementById(iconId);
-
-    if (input.type === 'password') {
-
-        input.type = 'text';
-
-        icon.classList.remove('bi-eye');
-        icon.classList.add('bi-eye-slash');
-
-    } else {
-
-        input.type = 'password';
-
-        icon.classList.remove('bi-eye-slash');
-        icon.classList.add('bi-eye');
-
-    }
-}
-
-</script>
 
 @endsection

@@ -13,9 +13,9 @@
     ])
 </head>
 
-<body class="bg-light">
+<body class="billing-auth bg-light">
 
-<div class="min-vh-100 d-flex align-items-center justify-content-center py-5">
+<div class="min-vh-100 d-flex align-items-center justify-content-center py-4 py-md-5">
 
     <div class="container">
 
@@ -26,7 +26,7 @@
                 {{-- CARD LOGIN --}}
                 <div class="card border-0 shadow-sm">
 
-                    <div class="card-body p-4 p-md-5">
+                    <div class="card-body p-3 p-sm-4 p-md-5">
 
                         {{-- LOGO PT --}}
                         <div class="text-center mb-4">
@@ -50,7 +50,7 @@
 
 
                         {{-- JUDUL LOGIN --}}
-                        <div class="mb-4">
+                        <x-ui.page-header>
 
                             <h4 class="fw-bold mb-1">
                                 Selamat Datang
@@ -60,8 +60,7 @@
                                 Silakan masuk untuk melanjutkan ke sistem.
                             </p>
 
-                        </div>
-
+                        </x-ui.page-header>
 
                         {{-- STATUS --}}
                         @if (session('status'))
@@ -100,15 +99,7 @@
 
 
                             {{-- EMAIL --}}
-                            <div class="mb-3">
-
-                                <label
-                                    for="email"
-                                    class="form-label fw-semibold"
-                                >
-                                    Email
-                                </label>
-
+                            <x-ui.field name="email" label="Email" :required="true">
                                 <div class="input-group">
 
                                     <span class="input-group-text bg-white">
@@ -129,8 +120,7 @@
 
                                 </div>
 
-                            </div>
-
+                            </x-ui.field>
 
                             {{-- PASSWORD --}}
                             <div class="mb-3">
@@ -142,29 +132,15 @@
                                     Password
                                 </label>
 
-                                <div class="input-group">
-
-                                    <span class="input-group-text bg-white">
-                                        🔒
-                                    </span>
-
-                                    <input
-                                        id="password"
-                                        type="password"
-                                        name="password"
-                                        class="form-control"
-                                        placeholder="Masukkan password"
-                                        required
-                                        autocomplete="current-password"
-                                    >
-
-                                </div>
+                                <x-ui.password-input id="password" name="password"
+                                    class="form-control" placeholder="Masukkan password"
+                                    required autocomplete="current-password" />
 
                             </div>
 
 
                             {{-- REMEMBER + LUPA PASSWORD --}}
-                            <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
 
                                 <div class="form-check">
 
@@ -196,6 +172,7 @@
 
 
                             {{-- BUTTON LOGIN --}}
+                            <x-ui.form-actions>
                             <button
                                 type="submit"
                                 class="btn w-100 text-white fw-semibold py-2"
@@ -203,6 +180,7 @@
                             >
                                 Login
                             </button>
+                            </x-ui.form-actions>
 
                         </form>
 

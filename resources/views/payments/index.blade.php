@@ -37,18 +37,8 @@
 
 
     {{-- HEADER --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <div>
-
-            <p class="text-muted mb-0">
-                Kelola tagihan dan pembayaran customer.
-            </p>
-
-        </div>
-
-
-        <div class="d-flex gap-2">
+    <x-ui.page-header description="Kelola tagihan dan pembayaran customer.">
+        <x-slot:actions>
 
             <form action="{{ route('payments.generate-monthly') }}"
                   method="POST">
@@ -75,68 +65,11 @@
 
             </a>
 
-        </div>
-
-    </div>
-
-
-    {{-- SEARCH --}}
-    <div class="card border-0 shadow-sm mb-4">
-
-        <div class="card-body">
-
-            <form action="{{ route('payments.index') }}"
-                  method="GET">
-
-                <div class="row g-2">
-
-                    <div class="col-md-6">
-
-                        <input
-                            type="text"
-                            name="search"
-                            class="form-control"
-                            placeholder="Cari nama customer..."
-                            value="{{ $search ?? '' }}"
-                        >
-
-                    </div>
+        </x-slot:actions>
+    </x-ui.page-header>
 
 
-                    <div class="col-auto">
-
-                        <button type="submit"
-                                class="btn btn-primary">
-
-                            🔍 Cari
-
-                        </button>
-
-                    </div>
-
-
-                    @if (!empty($search))
-
-                        <div class="col-auto">
-
-                            <a href="{{ route('payments.index') }}"
-                               class="btn btn-secondary">
-
-                                Reset
-
-                            </a>
-
-                        </div>
-
-                    @endif
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
+    <x-ui.customer-search :action="route('payments.index')" :search="$search" />
 
 
     {{-- TABEL PAYMENT --}}
@@ -144,16 +77,16 @@
 
         <div class="card-body p-0">
 
-            <div class="table-responsive">
+            <div class="table-responsive" tabindex="0" role="region" aria-label="Daftar payment">
 
-                <table class="table table-hover align-middle mb-0">
+                <x-ui.table>
 
                     <thead class="table-light">
 
                         <tr>
 
-                            <th class="px-4 py-3">
-                                No
+                            <th class="px-4 py-3 text-center" scope="col">
+                                No.
                             </th>
 
                             <th>
@@ -201,7 +134,7 @@
                             <tr>
 
                                 {{-- NO --}}
-                                <td class="px-4">
+                                <td data-label="No." class="px-4">
 
                                     {{ $customers->firstItem() + $loop->index }}
 
@@ -209,7 +142,7 @@
 
 
                                 {{-- CUSTOMER --}}
-                                <td>
+                                <td data-label="Customer">
 
                                     <strong>
                                         {{ $customer->nama }}
@@ -225,7 +158,7 @@
 
 
                                 {{-- PAKET --}}
-                                <td>
+                                <td data-label="Paket">
 
                                     @if ($customer->package)
 
@@ -249,18 +182,17 @@
 
 
                                 {{-- PERIODE --}}
-                              <td>
-    @if ($payment)
-        {{ $payment->periode }}
-        {{ $payment->tahun }}
-    @else
-        <span class="text-muted">-</span>
-    @endif
-</td>
+                                <td data-label="Periode">
+                                    @if ($payment)
+                                        {{ $payment->periode }} {{ $payment->tahun }}
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
 
 
                                 {{-- TAGIHAN --}}
-                                <td>
+                                <td data-label="Tagihan">
 
                                     <strong class="text-primary">
 
@@ -278,31 +210,15 @@
 
 
                                 {{-- STATUS --}}
-                                <td>
+                                <td data-label="Status">
 
-                                    @if ($payment && $payment->status === 'lunas')
-
-                                        <span class="badge bg-success px-3 py-2">
-
-                                            ✓ Lunas
-
-                                        </span>
-
-                                    @else
-
-                                        <span class="badge bg-danger px-3 py-2">
-
-                                            ✕ Belum Lunas
-
-                                        </span>
-
-                                    @endif
+                                    <x-ui.payment-status :status="$payment?->status" />
 
                                 </td>
 
 
                                 {{-- TANGGAL BAYAR --}}
-                                <td>
+                                <td data-label="Tanggal Bayar">
 
                                     @if ($payment && $payment->tanggal_bayar)
 
@@ -320,26 +236,12 @@
 
 
                                 {{-- AKSI --}}
-                                <td class="text-center">
-
+                                <td data-label="Aksi" class="text-center">
+                                    <div class="record-actions">
                                     @if ($payment)
 
-                                        {{-- DETAIL --}}
-                                        <a href="{{ route('payments.show', $payment) }}"
-                                           class="btn btn-sm btn-info text-white me-1">
-
-                                            Detail
-
-                                        </a>
-
-
-                                        {{-- EDIT --}}
-                                        <a href="{{ route('payments.edit', $payment) }}"
-                                           class="btn btn-sm btn-warning me-1">
-
-                                            Edit
-
-                                        </a>
+                                        <x-ui.row-action action="detail" :href="route('payments.show', $payment)" />
+                                        <x-ui.row-action action="edit" :href="route('payments.edit', $payment)" />
 
 
                                         {{-- HAPUS --}}
@@ -351,12 +253,7 @@
                                             @csrf
                                             @method('DELETE')
 
-                                            <button type="submit"
-                                                    class="btn btn-sm btn-danger">
-
-                                                Hapus
-
-                                            </button>
+                                            <x-ui.row-action action="delete" />
 
                                         </form>
 
@@ -367,7 +264,7 @@
                                         </span>
 
                                     @endif
-
+                                    </div>
                                 </td>
 
                             </tr>
@@ -379,21 +276,7 @@
                                 <td colspan="8"
                                     class="text-center py-5">
 
-                                    <div class="text-muted">
-
-                                        <div class="fs-1 mb-3">
-                                            💳
-                                        </div>
-
-                                        <h5>
-                                            Belum ada customer
-                                        </h5>
-
-                                        <p class="mb-3">
-                                            Belum ada customer yang memiliki paket.
-                                        </p>
-
-                                    </div>
+                                    <x-ui.empty-state title="Belum ada customer" description="Belum ada customer yang memiliki paket." />
 
                                 </td>
 
@@ -403,7 +286,7 @@
 
                     </tbody>
 
-                </table>
+                </x-ui.table>
 
             </div>
 
